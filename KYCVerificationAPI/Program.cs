@@ -1,34 +1,30 @@
+using System.Text.Json.Serialization;
 using KYCVerificationAPI.Core;
 using KYCVerificationAPI.Core.Extensions;
+using Scalar.AspNetCore;
 using Serilog;
 using Serilog.Events;
 using SerilogTracing;
 
+var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? string.Empty;
 Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Override("Microsoft.AspNetCore.Hosting", LogEventLevel.Warning)
-    .MinimumLevel.Override("Microsoft.AspNetCore.Routing", LogEventLevel.Warning)
-    .Enrich.WithProperty("Application", ApiConstants.ApplicationName)
     .WriteTo.Console()
     .WriteTo.Debug()
-    .WriteTo.Trace()
-    .WriteTo.File("Logs/applog.log", rollingInterval: RollingInterval.Hour)
-    .CreateLogger();
+    .CreateBootstrapLogger();
 
+Log.Information("Starting up Env:{Environment}", environment);
 using var listener = new ActivityListenerConfiguration()
     .Instrument.AspNetCoreRequests()
     .TraceToSharedLogger();
 
 try
 {
+    Log.Information("Starting up"); 
     var builder = WebApplication.CreateBuilder(args);
 
     // Add services to the container.
     builder.AddApiServices();
     
-    builder.Services.AddControllers();
-    // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-    builder.Services.AddOpenApi();
-
     var app = builder.Build();
 
     app.UseCors(ApiConstants.AllowedClients);
@@ -37,17 +33,21 @@ try
     if (app.Environment.IsDevelopment())
     {
         app.MapOpenApi();
+        app.MapScalarApiReference(options =>
+        {
+            options.Title = "KYC Verification REST API";
+            options.ShowSidebar = true;
+        });
     }
     
     app.UseSerilogRequestLogging(options =>
     {
-        // Emit debug-level events instead of the defaults
-        options.GetLevel = (httpContext, elapsed, ex) => LogEventLevel.Debug;
+        options.GetLevel = (httpContext, elapsed, ex) => LogEventLevel.Information;
     
         // Attach additional properties to the request completion event
         options.EnrichDiagnosticContext = (diagnosticContext, httpContext) =>
         {
-            diagnosticContext.Set("RequestHost", httpContext.Request.Host.Value ?? "unknown");
+            diagnosticContext.Set("RequestHost", httpContext.Request.Host.Value ?? string.Empty);
             diagnosticContext.Set("RequestScheme", httpContext.Request.Scheme);
         };
     });
