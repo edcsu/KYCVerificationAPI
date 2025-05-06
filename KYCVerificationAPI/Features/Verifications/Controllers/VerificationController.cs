@@ -50,22 +50,22 @@ public class VerificationController : ControllerBase
         {
             Code = 201,
             Status = VerificationStatus.Pending,
-            CreatedAt = DateTime.Now,
+            CreatedAt = DateTime.UtcNow,
             TransactionId = result
         };
         
         _logger.LogInformation("Finished creating a verification");
-        
-        return Created(string.Empty, pendingResponse);
+        const string actionName = nameof(GetByIdAsync);
+        return Created($"api/verifications/{result}", pendingResponse);
     }
     
-    [HttpGet("{id:Guid}")]
+    [HttpGet("{id:Guid}", Name = "GetById")]
     [ProducesResponseType(typeof(VerificationResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [Stability(Stability.Stable)]
-    public async Task<IActionResult> GetAsync([FromRoute] Guid id,
+    public async Task<IActionResult> GetByIdAsync([FromRoute] Guid id,
         CancellationToken token = default)
     {
         if (id == Guid.Empty)

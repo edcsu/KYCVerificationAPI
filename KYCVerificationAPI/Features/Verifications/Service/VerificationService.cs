@@ -7,16 +7,8 @@ using KYCVerificationAPI.Features.Verifications.Responses;
 
 namespace KYCVerificationAPI.Features.Verifications.Service;
 
-public class VerificationService: IVerificationService
+public class VerificationService(ILogger<VerificationService> logger) : IVerificationService
 {
-    private readonly ILogger<VerificationService> _logger;
-
-    public VerificationService(ExternalIdService externalIdService, 
-        ILogger<VerificationService> logger)
-    {
-        _logger = logger;
-    }
-    
     public async Task<Guid> CreateAsync(CreateVerification createVerification, 
         CancellationToken cancellationToken = default)
     {
@@ -30,7 +22,7 @@ public class VerificationService: IVerificationService
             Nin = createVerification.Nin,
             CardNumber = createVerification.CardNumber
         };
-        _logger.LogInformation("Saved verification");
+        logger.LogInformation("Saved verification");
 
         return transactionId;
     }
@@ -42,8 +34,8 @@ public class VerificationService: IVerificationService
         {
             TransactionId = Guid.CreateVersion7(),
             StatusCode = 200,
-            CreatedAt = DateTime.Now,
-            UpdatedAt = DateTime.Now,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
             Data = new VerificationData
             {
                 Nin =  "XXXPX1234A",

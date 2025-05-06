@@ -1,9 +1,11 @@
 using System.Text.Json.Serialization;
 using FluentValidation;
+using KYCVerificationAPI.Data;
 using KYCVerificationAPI.Features.Vendors.Services;
 using KYCVerificationAPI.Features.Verifications.Requests;
 using KYCVerificationAPI.Features.Verifications.Service;
 using KYCVerificationAPI.Features.Verifications.Validators;
+using Microsoft.EntityFrameworkCore;
 
 namespace KYCVerificationAPI.Core.Extensions;
 
@@ -11,6 +13,14 @@ public static class ConfigureServices
 {
     public static void AddApiServices(this WebApplicationBuilder builder)
     {
+        builder.Services.AddDbContext<AppDbContext>(options =>
+        {
+            options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"), opts =>
+            {
+                opts.EnableRetryOnFailure();
+            });
+        });
+        
         builder.Services.AddCors(options =>
         {
             options.AddPolicy(ApiConstants.AllowedClients, policy =>
@@ -37,7 +47,7 @@ public static class ConfigureServices
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         builder.Services.AddOpenApi();
         
-        builder.Services.AddTransient<IVerificationService, VerificationService>();
+        builder.Services.AddScoped<IVerificationService, VerificationService>();
 
         builder.Services.AddScoped<IExternalIdService, ExternalIdService>();
         
