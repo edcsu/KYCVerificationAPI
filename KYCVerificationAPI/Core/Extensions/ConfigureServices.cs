@@ -1,4 +1,4 @@
-namespace KYCVerificationAPI.Core;
+namespace KYCVerificationAPI.Core.Extensions;
 
 public static class ConfigureServices
 {
@@ -14,5 +14,8 @@ public static class ConfigureServices
                     .AllowAnyHeader();
             });
         });
+        
+        builder.AddSerilogConfig();
+
     }
 }
