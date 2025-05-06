@@ -1,11 +1,31 @@
+using KYCVerificationAPI.Core;
 using Serilog;
+using Serilog.Events;
+using SerilogTracing;
+
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Override("Microsoft.AspNetCore.Hosting", LogEventLevel.Warning)
+    .MinimumLevel.Override("Microsoft.AspNetCore.Routing", LogEventLevel.Warning)
+    .Enrich.WithProperty("Application", ApiConstants.ApplicationName)
+    .WriteTo.Console()
+    .WriteTo.Debug()
+    .WriteTo.Trace()
+    .WriteTo.File("Logs/applog.log", rollingInterval: RollingInterval.Hour)
+    .CreateLogger();
+
+using var listener = new ActivityListenerConfiguration()
+    .Instrument.AspNetCoreRequests()
+    .TraceToSharedLogger();
 
 try
 {
     var builder = WebApplication.CreateBuilder(args);
 
     // Add services to the container.
-
+    builder.AddApiServices();
+    
+    builder.Services.AddSerilog();
+    
     builder.Services.AddControllers();
     // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
     builder.Services.AddOpenApi();
