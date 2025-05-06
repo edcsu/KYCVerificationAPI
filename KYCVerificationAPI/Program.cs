@@ -1,4 +1,5 @@
 using KYCVerificationAPI.Core;
+using KYCVerificationAPI.Core.Extensions;
 using Serilog;
 using Serilog.Events;
 using SerilogTracing;
@@ -32,13 +33,30 @@ try
 
     var app = builder.Build();
 
+    app.UseCors(ApiConstants.AllowedClients);
+    
     // Configure the HTTP request pipeline.
     if (app.Environment.IsDevelopment())
     {
         app.MapOpenApi();
     }
-
+    
+    app.UseSerilogRequestLogging(options =>
+    {
+        // Emit debug-level events instead of the defaults
+        options.GetLevel = (httpContext, elapsed, ex) => LogEventLevel.Debug;
+    
+        // Attach additional properties to the request completion event
+        options.EnrichDiagnosticContext = (diagnosticContext, httpContext) =>
+        {
+            diagnosticContext.Set("RequestHost", httpContext.Request.Host.Value ?? "unknown");
+            diagnosticContext.Set("RequestScheme", httpContext.Request.Scheme);
+        };
+    });
+    
     app.UseHttpsRedirection();
+
+    app.UseApiExceptionHandler();
 
     app.UseAuthorization();
 
