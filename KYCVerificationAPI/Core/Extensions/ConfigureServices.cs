@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace KYCVerificationAPI.Core.Extensions;
 
 public static class ConfigureServices
@@ -16,6 +18,12 @@ public static class ConfigureServices
         });
         
         builder.AddSerilogConfig();
+        
+        builder.Services.AddControllers().AddJsonOptions(options =>
+        {
+            options.JsonSerializerOptions.WriteIndented = true;
 
+            options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        });
     }
 }

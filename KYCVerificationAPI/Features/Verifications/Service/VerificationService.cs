@@ -26,8 +26,8 @@ public class VerificationService: IVerificationService
             {
                 Nin =  "XXXPX1234A",
                 CardNumber = "00000001",
-                FirstName = string.Empty,
-                GivenName = string.Empty,
+                FirstName = "John",
+                GivenName = "Doe",
                 DateOfBirth = new DateOnly(2000,1,1),
                 Status = VerificationStatus.Valid,
                 NinAsPerIdMatches = true,
