@@ -1,0 +1,6 @@
+@KYCVerificationAPI_HostAddress = http://localhost:5160
+
+GET {{KYCVerificationAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
