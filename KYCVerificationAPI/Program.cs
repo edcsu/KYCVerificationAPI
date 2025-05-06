@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using KYCVerificationAPI.Core;
 using KYCVerificationAPI.Core.Extensions;
 using Scalar.AspNetCore;
@@ -23,9 +24,6 @@ try
 
     // Add services to the container.
     builder.AddApiServices();
-
-    // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-    builder.Services.AddOpenApi();
     
     var app = builder.Build();
 

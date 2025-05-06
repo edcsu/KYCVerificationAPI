@@ -28,7 +28,11 @@ public static class ConfigureServices
             options.JsonSerializerOptions.WriteIndented = true;
 
             options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            
         });
+
+        // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+        builder.Services.AddOpenApi();
         
         builder.Services.AddTransient<IVerificationService, VerificationService>();
 

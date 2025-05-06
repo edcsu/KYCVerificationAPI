@@ -1,16 +1,36 @@
+using System.ComponentModel;
 using KYCVerificationAPI.Core;
 
 namespace KYCVerificationAPI.Features.Verifications.Responses;
 
 public record VerificationData
 {
-    public required string FirstName { get; init; }
-    public required string GivenName { get; init; }
-    public required DateOnly DateOfBirth { get; init; }
-    public required string Nin { get; init; }
-    public required string CardNumber { get; init; }
-    public required VerificationStatus Status { get; init; }
-    public required bool NameAsPerIdMatches { get; init; }
-    public required bool NinAsPerIdMatches { get; init; }
-    public required bool DateOfBirthMatches { get; init; }
+    [Description("FirstName of the holder on their National ID card")]
+    public string FirstName { get; set; } = string.Empty;
+
+    [Description("GivenName of the holder on their National ID card")]
+    public string GivenName { get; init; } = string.Empty;
+    
+    [Description("DateOfBirth of the holder on their National ID card")]
+
+    public DateOnly DateOfBirth { get; set; } 
+    
+    [Description("Nin of the holder on their National ID card")]
+
+    public string Nin { get; init; } = string.Empty;
+    
+    [Description("CardNumber of the holder on their National ID card")]
+    public string CardNumber { get; init; } = string.Empty;
+    
+    [Description("Status of the Verification")]
+    public VerificationStatus Status { get; init; }
+    
+    [Description("Match result of the names")]
+    public bool NameAsPerIdMatches { get; set; }
+    
+    [Description("Match result of the nin")]
+    public bool NinAsPerIdMatches { get; set; }
+    
+    [Description("Match result of the date of birth")]
+    public bool DateOfBirthMatches { get; set; }
 }

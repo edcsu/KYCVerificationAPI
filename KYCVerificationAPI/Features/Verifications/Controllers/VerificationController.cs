@@ -1,3 +1,4 @@
+using System.Net.Mime;
 using FluentValidation;
 using KYCVerificationAPI.Core;
 using KYCVerificationAPI.Features.Verifications.Requests;
@@ -10,6 +11,8 @@ namespace KYCVerificationAPI.Features.Verifications.Controllers;
 
 [Route("api/verifications")]
 [ApiController]
+[Consumes(MediaTypeNames.Application.Json)]
+[Produces(MediaTypeNames.Application.Json)]
 public class VerificationController : ControllerBase
 {
     private readonly IVerificationService _verificationService;
