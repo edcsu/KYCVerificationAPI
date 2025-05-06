@@ -21,6 +21,8 @@ public static class ConfigureServices
             });
         });
         
+        builder.AddCustomApiVersioning();
+        
         builder.AddSerilogConfig();
         
         builder.Services.AddControllers().AddJsonOptions(options =>

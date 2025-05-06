@@ -1,4 +1,5 @@
 using System.Net.Mime;
+using Asp.Versioning;
 using FluentValidation;
 using KYCVerificationAPI.Core;
 using KYCVerificationAPI.Features.Verifications.Requests;
@@ -11,6 +12,7 @@ namespace KYCVerificationAPI.Features.Verifications.Controllers;
 
 [Route("api/verifications")]
 [ApiController]
+[ApiVersion(1)]
 [Consumes(MediaTypeNames.Application.Json)]
 [Produces(MediaTypeNames.Application.Json)]
 public class VerificationController : ControllerBase
