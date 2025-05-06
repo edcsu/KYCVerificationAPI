@@ -1,18 +1,23 @@
 using KYCVerificationAPI.Core;
 using KYCVerificationAPI.Core.Helpers;
+using KYCVerificationAPI.Data.Repositories;
 using KYCVerificationAPI.Features.Vendors.Requests;
 using KYCVerificationAPI.Features.Vendors.Services;
+using KYCVerificationAPI.Features.Verifications.Mappings;
 using KYCVerificationAPI.Features.Verifications.Requests;
 using KYCVerificationAPI.Features.Verifications.Responses;
 
 namespace KYCVerificationAPI.Features.Verifications.Service;
 
-public class VerificationService(ILogger<VerificationService> logger) : IVerificationService
+public class VerificationService(IVerificationRepository verificationRepository, 
+    ILogger<VerificationService> logger) : IVerificationService
 {
     public async Task<Guid> CreateAsync(CreateVerification createVerification, 
         CancellationToken cancellationToken = default)
     {
-        var transactionId = Guid.CreateVersion7();
+        var verification = createVerification.MapToVerification();
+        await verificationRepository.Add(verification, cancellationToken);
+        logger.LogInformation("Saved verification");
 
         var kycRequest = new KycRequest
         {
@@ -22,9 +27,7 @@ public class VerificationService(ILogger<VerificationService> logger) : IVerific
             Nin = createVerification.Nin,
             CardNumber = createVerification.CardNumber
         };
-        logger.LogInformation("Saved verification");
-
-        return transactionId;
+        return verification.Id;
     }
 
     public async Task<VerificationResponse?> GetByIdAsync(Guid id, 
