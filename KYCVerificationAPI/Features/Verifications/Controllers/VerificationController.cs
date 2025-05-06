@@ -3,6 +3,7 @@ using KYCVerificationAPI.Features.Verifications.Requests;
 using KYCVerificationAPI.Features.Verifications.Responses;
 using KYCVerificationAPI.Features.Verifications.Service;
 using Microsoft.AspNetCore.Mvc;
+using Scalar.AspNetCore;
 
 namespace KYCVerificationAPI.Features.Verifications.Controllers;
 
@@ -21,6 +22,7 @@ public class VerificationController : ControllerBase
     }
 
     [HttpPost]
+    [Stability(Stability.Stable)]
     public async Task<IActionResult> CreateAsync([FromBody] CreateVerification request,
         CancellationToken token = default)
     {

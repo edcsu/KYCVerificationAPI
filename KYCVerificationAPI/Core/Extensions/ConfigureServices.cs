@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using KYCVerificationAPI.Features.Verifications.Service;
 
 namespace KYCVerificationAPI.Core.Extensions;
 
@@ -25,5 +26,7 @@ public static class ConfigureServices
 
             options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
         });
+        
+        builder.Services.AddTransient<IVerificationService, VerificationService>();
     }
 }
