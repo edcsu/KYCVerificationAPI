@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using FluentValidation;
+using KYCVerificationAPI.Features.Vendors.Services;
 using KYCVerificationAPI.Features.Verifications.Requests;
 using KYCVerificationAPI.Features.Verifications.Service;
 using KYCVerificationAPI.Features.Verifications.Validators;
@@ -38,6 +39,8 @@ public static class ConfigureServices
         
         builder.Services.AddTransient<IVerificationService, VerificationService>();
 
+        builder.Services.AddScoped<IExternalIdService, ExternalIdService>();
+        
         builder.Services.AddScoped<IValidator<CreateVerification>, CreateVerificationValidator>();
 
     }

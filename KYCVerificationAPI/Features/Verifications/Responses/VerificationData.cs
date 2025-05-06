@@ -31,6 +31,9 @@ public record VerificationData
     [Description("Match result of the nin")]
     public bool NinAsPerIdMatches { get; set; }
     
+    [Description("Match result of the card number")]
+    public bool CardNumberAsPerIdMatches { get; set; }
+    
     [Description("Match result of the date of birth")]
     public bool DateOfBirthMatches { get; set; }
 }
