@@ -6,5 +6,5 @@ public record VerificationResponse
     public required Guid TransactionId { get; init; }
     public required DateTime CreatedAt { get; init; }
     public required DateTime UpdatedAt { get; init; }
-    public required VerificationResponse Data { get; init; }
+    public required VerificationData Data { get; init; }
 }
