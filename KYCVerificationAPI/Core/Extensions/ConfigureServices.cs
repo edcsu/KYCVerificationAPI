@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization;
 using FluentValidation;
 using KYCVerificationAPI.Data;
+using KYCVerificationAPI.Data.Repositories;
 using KYCVerificationAPI.Features.Vendors.Services;
 using KYCVerificationAPI.Features.Verifications.Requests;
 using KYCVerificationAPI.Features.Verifications.Service;
@@ -46,6 +47,8 @@ public static class ConfigureServices
 
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         builder.Services.AddOpenApi();
+        
+        builder.Services.AddScoped<IVerificationRepository, VerificationRepository>();
         
         builder.Services.AddScoped<IVerificationService, VerificationService>();
 

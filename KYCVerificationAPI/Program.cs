@@ -1,6 +1,6 @@
-using System.Text.Json.Serialization;
 using KYCVerificationAPI.Core;
 using KYCVerificationAPI.Core.Extensions;
+using KYCVerificationAPI.Data;
 using Scalar.AspNetCore;
 using Serilog;
 using Serilog.Events;
@@ -58,6 +58,8 @@ try
 
     app.UseAuthorization();
 
+    SeedData.Initialize(app);
+    
     app.MapControllers();
 
     app.Run();
