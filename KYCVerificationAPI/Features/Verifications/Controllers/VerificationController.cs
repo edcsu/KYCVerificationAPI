@@ -25,6 +25,9 @@ public class VerificationController : ControllerBase
 
     [HttpPost]
     [Stability(Stability.Stable)]
+    [ProducesResponseType(typeof(PendingResponse),StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> CreateAsync([FromBody] CreateVerification request,
         CancellationToken token = default)
     {
@@ -49,5 +52,31 @@ public class VerificationController : ControllerBase
         _logger.LogInformation("Finished creating a verification");
         
         return Created(string.Empty, pendingResponse);
+    }
+    
+    [HttpGet("{id:Guid}")]
+    [ProducesResponseType(typeof(VerificationResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [Stability(Stability.Stable)]
+    public async Task<IActionResult> GetAsync([FromRoute] Guid id,
+        CancellationToken token = default)
+    {
+        if (id == Guid.Empty)
+        {
+            _logger.LogInformation("Invalid verification Id");
+            return BadRequest();
+        }
+        _logger.LogInformation("Getting verification");
+        var response = await _verificationService.GetByIdAsync(id, token);
+
+        if (response is null)
+        {
+            _logger.LogInformation("Verification with {VerificationId}not found", id);
+            return NotFound();
+        }
+        _logger.LogInformation("Finished getting verification");
+        return Ok(response);
     }
 }
