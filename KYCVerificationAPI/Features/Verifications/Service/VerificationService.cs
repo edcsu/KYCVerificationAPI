@@ -1,4 +1,7 @@
 using KYCVerificationAPI.Core;
+using KYCVerificationAPI.Core.Helpers;
+using KYCVerificationAPI.Features.Vendors.Requests;
+using KYCVerificationAPI.Features.Vendors.Services;
 using KYCVerificationAPI.Features.Verifications.Requests;
 using KYCVerificationAPI.Features.Verifications.Responses;
 
@@ -6,10 +9,29 @@ namespace KYCVerificationAPI.Features.Verifications.Service;
 
 public class VerificationService: IVerificationService
 {
+    private readonly ILogger<VerificationService> _logger;
+
+    public VerificationService(ExternalIdService externalIdService, 
+        ILogger<VerificationService> logger)
+    {
+        _logger = logger;
+    }
+    
     public async Task<Guid> CreateAsync(CreateVerification createVerification, 
         CancellationToken cancellationToken = default)
     {
         var transactionId = Guid.CreateVersion7();
+
+        var kycRequest = new KycRequest
+        {
+            FirstName = createVerification.FirstName,
+            GivenName = createVerification.GivenName,
+            DateOfBirth = createVerification.DateOfBirth,
+            Nin = createVerification.Nin,
+            CardNumber = createVerification.CardNumber
+        };
+        _logger.LogInformation("Saved verification");
+
         return transactionId;
     }
 

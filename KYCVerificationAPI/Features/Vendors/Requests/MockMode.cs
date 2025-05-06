@@ -1,4 +1,4 @@
-namespace KYCVerificationAPI.Features.Verifications.Requests;
+namespace KYCVerificationAPI.Features.Vendors.Requests;
 
 public enum MockMode
 {
