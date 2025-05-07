@@ -52,6 +52,8 @@ try
         };
     });
     
+    app.AddCorrelationIdMiddleware();
+    
     app.UseHttpsRedirection();
 
     app.UseApiExceptionHandler();

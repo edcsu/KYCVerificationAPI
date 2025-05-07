@@ -24,7 +24,7 @@ public class Verification : BaseModel
     public string CreatedBy { get; init; } = string.Empty;
     
     [Column(TypeName = "varchar(50)")]
-    public string CorrelationId { get; init; } = string.Empty;
+    public string CorrelationId { get; set; } = string.Empty;
     
     public VerificationStatus Status { get; init; }
     public KycStatus KycStatus { get; init; }

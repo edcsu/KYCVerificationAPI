@@ -1,5 +1,6 @@
 using KYCVerificationAPI.Data.Entities;
 using KYCVerificationAPI.Features.Verifications.Requests;
+using KYCVerificationAPI.Features.Verifications.Responses;
 
 namespace KYCVerificationAPI.Features.Verifications.Mappings;
 
@@ -16,6 +17,30 @@ public static class ContractMapping
             CardNumber = request.CardNumber,
             DateOfBirth = request.DateOfBirth,
             CreatedAt = DateTime.UtcNow
+        };
+    }
+    
+    public static VerificationResponse MapToVerificationResponse(this Verification request)
+    {
+        return new VerificationResponse
+        {
+            TransactionId = request.Id,
+            StatusCode = 200,
+            CreatedAt = request.CreatedAt,
+            UpdatedAt = request.LastUpdated,
+            Data = new VerificationData
+            {
+                Nin = request.Nin,
+                CardNumber = request.CardNumber,
+                FirstName = request.FirstName,
+                GivenName = request.GivenName,
+                DateOfBirth = request.DateOfBirth,
+                Status = request.Status,
+                NinAsPerIdMatches = request.NinAsPerIdMatches,
+                NameAsPerIdMatches = request.NameAsPerIdMatches,
+                DateOfBirthMatches = request.DateOfBirthMatches,
+                CardNumberAsPerIdMatches = request.CardNumberAsPerIdMatches
+            }
         };
     }
 }

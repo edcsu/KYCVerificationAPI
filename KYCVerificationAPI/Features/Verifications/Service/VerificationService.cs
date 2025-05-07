@@ -12,10 +12,13 @@ namespace KYCVerificationAPI.Features.Verifications.Service;
 public class VerificationService(IVerificationRepository verificationRepository, 
     ILogger<VerificationService> logger) : IVerificationService
 {
-    public async Task<Guid> CreateAsync(CreateVerification createVerification, 
+    public async Task<Guid> CreateAsync(CreateVerification createVerification,
+        string correlationId,
         CancellationToken cancellationToken = default)
     {
         var verification = createVerification.MapToVerification();
+        verification.CorrelationId = correlationId;
+        
         await verificationRepository.Add(verification, cancellationToken);
         logger.LogInformation("Saved verification");
 
@@ -33,6 +36,7 @@ public class VerificationService(IVerificationRepository verificationRepository,
     public async Task<VerificationResponse?> GetByIdAsync(Guid id, 
         CancellationToken cancellationToken = default)
     {
+        var verification = await verificationRepository.GetByIdAsync(id, cancellationToken);
         return new VerificationResponse
         {
             TransactionId = Guid.CreateVersion7(),
@@ -50,6 +54,7 @@ public class VerificationService(IVerificationRepository verificationRepository,
                 NinAsPerIdMatches = true,
                 NameAsPerIdMatches = true,
                 DateOfBirthMatches = true,
+                CardNumberAsPerIdMatches = true
             }
         };
     }

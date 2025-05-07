@@ -13,7 +13,7 @@ public record VerificationData
     
     [Description("DateOfBirth of the holder on their National ID card")]
 
-    public DateOnly DateOfBirth { get; set; } 
+    public DateOnly? DateOfBirth { get; set; } 
     
     [Description("Nin of the holder on their National ID card")]
 
@@ -26,14 +26,14 @@ public record VerificationData
     public VerificationStatus Status { get; init; }
     
     [Description("Match result of the names")]
-    public bool NameAsPerIdMatches { get; set; }
+    public bool? NameAsPerIdMatches { get; set; }
     
     [Description("Match result of the nin")]
-    public bool NinAsPerIdMatches { get; set; }
+    public bool? NinAsPerIdMatches { get; set; }
     
     [Description("Match result of the card number")]
-    public bool CardNumberAsPerIdMatches { get; set; }
+    public bool? CardNumberAsPerIdMatches { get; set; }
     
     [Description("Match result of the date of birth")]
-    public bool DateOfBirthMatches { get; set; }
+    public bool? DateOfBirthMatches { get; set; }
 }

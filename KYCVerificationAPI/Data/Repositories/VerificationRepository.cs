@@ -17,9 +17,9 @@ public class VerificationRepository : IVerificationRepository
         return await _context.Verifications.ToListAsync(cancellationToken);
     }
 
-    public Verification? GetByIdAsync(Guid id)
+    public async Task<Verification?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
-        return _context.Verifications.FirstOrDefault(v => v.Id == id);
+        return await _context.Verifications.FirstOrDefaultAsync(v => v.Id == id, cancellationToken);
     }
 
     public async Task<Verification> Add(Verification verification, 
@@ -33,7 +33,7 @@ public class VerificationRepository : IVerificationRepository
 
     public async Task<Verification> Update(Verification verification, CancellationToken cancellationToken = default)
     {
-        verification.LastUpdated = DateTime.Now;
+        verification.LastUpdated = DateTime.UtcNow;
         _context.Verifications.Update(verification);
         await _context.SaveChangesAsync(cancellationToken);
         

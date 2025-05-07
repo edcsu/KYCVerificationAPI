@@ -14,7 +14,7 @@ public record VerificationResponse
     public DateTime CreatedAt { get; init; }
     
     [Description("The time the verification was updated")]
-    public DateTime UpdatedAt { get; init; }
+    public DateTime? UpdatedAt { get; init; }
 
     public VerificationData Data { get; init; } = new VerificationData();
 }

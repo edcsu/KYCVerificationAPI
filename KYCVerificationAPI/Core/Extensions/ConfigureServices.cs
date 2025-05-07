@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using FluentValidation;
+using KYCVerificationAPI.Core.Helpers;
 using KYCVerificationAPI.Data;
 using KYCVerificationAPI.Data.Repositories;
 using KYCVerificationAPI.Features.Vendors.Services;
@@ -16,7 +17,8 @@ public static class ConfigureServices
     {
         builder.Services.AddDbContext<AppDbContext>(options =>
         {
-            options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"), opts =>
+            options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"), 
+                opts =>
             {
                 opts.EnableRetryOnFailure();
             });
@@ -55,6 +57,7 @@ public static class ConfigureServices
         builder.Services.AddScoped<IExternalIdService, ExternalIdService>();
         
         builder.Services.AddScoped<IValidator<CreateVerification>, CreateVerificationValidator>();
-
+        
+        builder.Services.AddScoped<ICorrelationIdGenerator, CorrelationIdGenerator>();
     }
 }
