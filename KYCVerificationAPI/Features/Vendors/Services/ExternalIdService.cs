@@ -29,6 +29,7 @@ public class ExternalIdService : IExternalIdService
                     NameAsPerIdMatches = true,
                     NinAsPerIdMatches = true,
                     DateOfBirthMatches = true,
+                    CardNumberAsPerIdMatches = true,
                     Message = "Verification was successful"
                 };
             

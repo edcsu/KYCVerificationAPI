@@ -1,10 +1,6 @@
 using Hangfire;
-using KYCVerificationAPI.Core;
-using KYCVerificationAPI.Core.Helpers;
 using KYCVerificationAPI.Data.Repositories;
 using KYCVerificationAPI.Features.Scheduler.Services;
-using KYCVerificationAPI.Features.Vendors.Requests;
-using KYCVerificationAPI.Features.Vendors.Services;
 using KYCVerificationAPI.Features.Verifications.Mappings;
 using KYCVerificationAPI.Features.Verifications.Requests;
 using KYCVerificationAPI.Features.Verifications.Responses;
@@ -13,22 +9,25 @@ namespace KYCVerificationAPI.Features.Verifications.Service;
 
 public class VerificationService(IVerificationRepository verificationRepository,
     ISchedulerService schedulerService,  
-    IBackgroundJobClient _backgroundJob,
+    IBackgroundJobClient backgroundJob,
     ILogger<VerificationService> logger) : IVerificationService
 {
-    public async Task<Guid> CreateAsync(CreateVerification createVerification,
+    public async Task<VerificationResponse> CreateAsync(CreateVerification createVerification,
         string correlationId,
+        string email,
         CancellationToken cancellationToken = default)
     {
         var verification = createVerification.MapToVerification();
         verification.CorrelationId = correlationId;
+        verification.CreatedBy = email;
         
-        await verificationRepository.Add(verification, cancellationToken);
+        var savedVerification = await verificationRepository.Add(verification, cancellationToken);
+        var verificationResponse = savedVerification.MapToVerificationResponse();
         logger.LogInformation("Saved verification");
 
-        var verificationJobId = _backgroundJob.Enqueue(() => schedulerService.ScheduleVerificationAsync(verification.Id, cancellationToken));
+        var verificationJobId = backgroundJob.Enqueue(() => schedulerService.ScheduleVerificationAsync(verification.Id, cancellationToken));
         logger.LogInformation("Scheduled verification request with jobID {JobId}", verificationJobId);
-        return verification.Id;
+        return verificationResponse;
     }
 
     public async Task<VerificationResponse?> GetByIdAsync(Guid id, 
