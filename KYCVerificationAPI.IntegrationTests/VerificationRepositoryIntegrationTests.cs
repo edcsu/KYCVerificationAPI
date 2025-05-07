@@ -1,19 +1,14 @@
-using KYCVerificationAPI.Data;
 using KYCVerificationAPI.Data.Repositories;
-using Microsoft.EntityFrameworkCore;
-using Testcontainers.PostgreSql;
 
 namespace KYCVerificationAPI.IntegrationTests;
 
 public class VerificationRepositoryIntegrationTests : IClassFixture<DatabaseFixture>
 {
-    private readonly DatabaseFixture _fixture;
-    private VerificationRepository _verificationRepository;
+    private readonly VerificationRepository _verificationRepository;
     
     public VerificationRepositoryIntegrationTests(DatabaseFixture fixture)
     {
-        _fixture = fixture;
-        _verificationRepository = new VerificationRepository(_fixture.DbContext);
+        _verificationRepository = new VerificationRepository(fixture.DbContext);
     }
     
     [Fact]
@@ -67,7 +62,7 @@ public class VerificationRepositoryIntegrationTests : IClassFixture<DatabaseFixt
     {
         // Arrange
         var newVerification = IntegrationHelpers.GetVerification();
-        var savedVerification = await _verificationRepository.Add(newVerification);
+        await _verificationRepository.Add(newVerification);
 
         // Act
         var result = await _verificationRepository.GetAll(CancellationToken.None);
