@@ -1,6 +1,7 @@
 using KYCVerificationAPI.Core;
 using KYCVerificationAPI.Core.Helpers;
 using KYCVerificationAPI.Data.Repositories;
+using KYCVerificationAPI.Features.Scheduler.Services;
 using KYCVerificationAPI.Features.Vendors.Requests;
 using KYCVerificationAPI.Features.Vendors.Services;
 using KYCVerificationAPI.Features.Verifications.Mappings;
@@ -9,7 +10,8 @@ using KYCVerificationAPI.Features.Verifications.Responses;
 
 namespace KYCVerificationAPI.Features.Verifications.Service;
 
-public class VerificationService(IVerificationRepository verificationRepository, 
+public class VerificationService(IVerificationRepository verificationRepository,
+    ISchedulerService schedulerService,
     ILogger<VerificationService> logger) : IVerificationService
 {
     public async Task<Guid> CreateAsync(CreateVerification createVerification,
@@ -22,14 +24,7 @@ public class VerificationService(IVerificationRepository verificationRepository,
         await verificationRepository.Add(verification, cancellationToken);
         logger.LogInformation("Saved verification");
 
-        var kycRequest = new KycRequest
-        {
-            FirstName = createVerification.FirstName,
-            GivenName = createVerification.GivenName,
-            DateOfBirth = createVerification.DateOfBirth,
-            Nin = createVerification.Nin,
-            CardNumber = createVerification.CardNumber
-        };
+        await schedulerService.ScheduleVerificationAsync(verification.Id, cancellationToken);
         return verification.Id;
     }
 
@@ -37,25 +32,6 @@ public class VerificationService(IVerificationRepository verificationRepository,
         CancellationToken cancellationToken = default)
     {
         var verification = await verificationRepository.GetByIdAsync(id, cancellationToken);
-        return new VerificationResponse
-        {
-            TransactionId = Guid.CreateVersion7(),
-            StatusCode = 200,
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow,
-            Data = new VerificationData
-            {
-                Nin =  "XXXPX1234A",
-                CardNumber = "00000001",
-                FirstName = "John",
-                GivenName = "Doe",
-                DateOfBirth = new DateOnly(2000,1,1),
-                Status = VerificationStatus.Valid,
-                NinAsPerIdMatches = true,
-                NameAsPerIdMatches = true,
-                DateOfBirthMatches = true,
-                CardNumberAsPerIdMatches = true
-            }
-        };
+        return verification?.MapToVerificationResponse();
     }
 }

@@ -7,4 +7,5 @@ public class ClientSideException : Exception
     }
 }
 
+public class ClientFriendlyException(string message) : ClientSideException(message);
 public class NotFoundException(string message) : ClientSideException(message);

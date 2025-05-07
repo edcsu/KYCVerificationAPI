@@ -3,6 +3,7 @@ using FluentValidation;
 using KYCVerificationAPI.Core.Helpers;
 using KYCVerificationAPI.Data;
 using KYCVerificationAPI.Data.Repositories;
+using KYCVerificationAPI.Features.Scheduler.Services;
 using KYCVerificationAPI.Features.Vendors.Services;
 using KYCVerificationAPI.Features.Verifications.Requests;
 using KYCVerificationAPI.Features.Verifications.Service;
@@ -59,5 +60,7 @@ public static class ConfigureServices
         builder.Services.AddScoped<IValidator<CreateVerification>, CreateVerificationValidator>();
         
         builder.Services.AddScoped<ICorrelationIdGenerator, CorrelationIdGenerator>();
+        
+        builder.Services.AddScoped<ISchedulerService, SchedulerService>();
     }
 }

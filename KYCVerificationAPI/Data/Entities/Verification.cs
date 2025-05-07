@@ -12,7 +12,7 @@ public class Verification : BaseModel
     [Column(TypeName = "varchar(25)")]
     public string GivenName { get; init; } = string.Empty;
     
-    public DateOnly? DateOfBirth { get; init; }
+    public DateOnly DateOfBirth { get; init; }
     
     [Column(TypeName = "varchar(14)")]
     public string Nin { get; init; } = string.Empty;
@@ -21,17 +21,20 @@ public class Verification : BaseModel
     public string CardNumber { get; init; } = string.Empty;
     
     [Column(TypeName = "varchar(25)")]
-    public string CreatedBy { get; init; } = string.Empty;
+    public string CreatedBy { get; set; } = string.Empty;
     
     [Column(TypeName = "varchar(50)")]
     public string CorrelationId { get; set; } = string.Empty;
     
-    public VerificationStatus Status { get; init; }
-    public KycStatus KycStatus { get; init; }
+    public VerificationStatus Status { get; set; }
+    public KycStatus KycStatus { get; set; }
 
-    public int? Retries { get; init; }
-    public bool? NameAsPerIdMatches { get; init; }
-    public bool? NinAsPerIdMatches { get; init; }
-    public bool? CardNumberAsPerIdMatches { get; init; }
-    public bool? DateOfBirthMatches { get; init; }
+    public int? Retries { get; set; }
+    public bool? NameAsPerIdMatches { get; set; }
+    public bool? NinAsPerIdMatches { get; set; }
+    public bool? CardNumberAsPerIdMatches { get; set; }
+    public bool? DateOfBirthMatches { get; set; }
+    
+    [Column(TypeName = "varchar(50)")]
+    public string? KycMessage { get; set; }
 }
