@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KYCVerificationAPI", "KYCVe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KYCVerificationAPI.Tests", "KYCVerificationAPI.Tests\KYCVerificationAPI.Tests.csproj", "{CF5318DB-DB20-45A5-9946-5F28B75B866E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KYCVerificationAPI.IntegrationTests", "KYCVerificationAPI.IntegrationTests\KYCVerificationAPI.IntegrationTests.csproj", "{9B750F7B-4618-4C28-888D-354B922720E0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{CF5318DB-DB20-45A5-9946-5F28B75B866E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CF5318DB-DB20-45A5-9946-5F28B75B866E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CF5318DB-DB20-45A5-9946-5F28B75B866E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9B750F7B-4618-4C28-888D-354B922720E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B750F7B-4618-4C28-888D-354B922720E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B750F7B-4618-4C28-888D-354B922720E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B750F7B-4618-4C28-888D-354B922720E0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
