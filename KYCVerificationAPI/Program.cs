@@ -71,6 +71,8 @@ try
         Authorization = [new HangfireAuthorizationFilter()]
     });
     
+    app.UseRateLimiter();
+
     app.MapControllers();
 
     app.Run();

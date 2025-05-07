@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using System.Threading.RateLimiting;
 using FluentValidation;
 using Hangfire;
 using Hangfire.PostgreSql;
@@ -16,6 +17,7 @@ using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using Serilog;
 
 namespace KYCVerificationAPI.Core.Extensions;
 
@@ -130,5 +132,36 @@ public static class ConfigureServices
                 });
             });
         }
+        
+        var limitOptions = new RateLimitConfig();
+        builder.Configuration.GetSection(RateLimitConfig.SectionName).Bind(limitOptions);
+        
+        builder.Services.AddRateLimiter(options =>
+        {
+            options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
+            {
+                var path = context.Request.Path.Value ?? string.Empty;
+                var ipAddress = context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+                Log.Information("This request is coming from: {IpAddress}", ipAddress);
+
+                if (!path.Contains("api", StringComparison.OrdinalIgnoreCase))
+                {
+                    Log.Information("Rate limiting applied");
+                    return RateLimitPartition.GetFixedWindowLimiter(
+                        ipAddress,
+                        partition => new FixedWindowRateLimiterOptions
+                        {
+                            PermitLimit = limitOptions.PermitLimit,             // 1 requests
+                            Window = TimeSpan.FromMinutes(limitOptions.Window), // Per 5 minutes
+                            QueueLimit = limitOptions.QueueLimit,              // Allow 5 requests in the queue
+                            QueueProcessingOrder = QueueProcessingOrder.OldestFirst
+                        });
+                }
+
+                // Allow unlimited requests for "api" paths
+                Log.Information("No rate limiting applied");
+                return RateLimitPartition.GetNoLimiter(context.Connection.RemoteIpAddress?.ToString() ?? "unknown");
+            });
+        });
     }
 }
