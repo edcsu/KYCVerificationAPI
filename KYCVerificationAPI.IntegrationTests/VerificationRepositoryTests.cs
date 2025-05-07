@@ -2,11 +2,11 @@ using KYCVerificationAPI.Data.Repositories;
 
 namespace KYCVerificationAPI.IntegrationTests;
 
-public class VerificationRepositoryIntegrationTests : IClassFixture<DatabaseFixture>
+public class VerificationRepositoryTests : IClassFixture<DatabaseFixture>
 {
     private readonly VerificationRepository _verificationRepository;
     
-    public VerificationRepositoryIntegrationTests(DatabaseFixture fixture)
+    public VerificationRepositoryTests(DatabaseFixture fixture)
     {
         _verificationRepository = new VerificationRepository(fixture.DbContext);
     }
