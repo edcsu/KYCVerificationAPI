@@ -6,6 +6,8 @@ using Hangfire.PostgreSql;
 using KYCVerificationAPI.Core.Helpers;
 using KYCVerificationAPI.Data;
 using KYCVerificationAPI.Data.Repositories;
+using KYCVerificationAPI.Features.Auth.Requests;
+using KYCVerificationAPI.Features.Auth.Validators;
 using KYCVerificationAPI.Features.Scheduler.Services;
 using KYCVerificationAPI.Features.Vendors.Services;
 using KYCVerificationAPI.Features.Verifications.Requests;
@@ -82,6 +84,8 @@ public static class ConfigureServices
         builder.Services.AddScoped<IExternalIdService, ExternalIdService>();
         
         builder.Services.AddScoped<IValidator<CreateVerification>, CreateVerificationValidator>();
+        
+        builder.Services.AddScoped<IValidator<TokenGenerationRequest>, TokenGenerationRequestValidator>();
         
         builder.Services.AddScoped<ICorrelationIdGenerator, CorrelationIdGenerator>();
         

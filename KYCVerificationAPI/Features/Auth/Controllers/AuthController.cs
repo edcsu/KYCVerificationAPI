@@ -4,13 +4,17 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
 using Asp.Versioning;
+using FluentValidation;
 using KYCVerificationAPI.Core;
+using KYCVerificationAPI.Core.Helpers;
 using KYCVerificationAPI.Features.Auth.Requests;
 using KYCVerificationAPI.Features.Auth.Responses;
-using KYCVerificationAPI.Features.Verifications.Responses;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
+using Serilog.Context;
+using Serilog.Core;
+using Serilog.Core.Enrichers;
 
 namespace KYCVerificationAPI.Features.Auth.Controllers;
 
@@ -21,7 +25,18 @@ namespace KYCVerificationAPI.Features.Auth.Controllers;
 [Produces(MediaTypeNames.Application.Json)]
 public class AuthController: ControllerBase
 {
-    
+    private readonly IValidator<TokenGenerationRequest> _tokenValidator;
+    private readonly ILogger<AuthController> _logger;
+    private readonly ICorrelationIdGenerator _correlationIdGenerator;
+    public AuthController(IValidator<TokenGenerationRequest> tokenValidator, 
+        ICorrelationIdGenerator correlationIdGenerator, 
+        ILogger<AuthController> logger)
+    {
+        _tokenValidator = tokenValidator;
+        _correlationIdGenerator = correlationIdGenerator;
+        _logger = logger;
+    }
+
     [HttpPost("token")]
     [Stability(Stability.Stable)]
     [ProducesResponseType(typeof(TokenResponse),StatusCodes.Status200OK, MediaTypeNames.Application.Json)]
@@ -29,48 +44,68 @@ public class AuthController: ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [EndpointSummary("Generates an access token.")]
     [EndpointDescription("Get an access token to use the API")]
-    public IActionResult GenerateToken([FromBody]TokenGenerationRequest request)
+    public async Task<IActionResult> GenerateToken([FromBody]TokenGenerationRequest request,
+        CancellationToken cancellationToken = default)
     {
-        var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.UTF8.GetBytes(ApiConstants.TokenSecret);
-
-        var claims = new List<Claim>
+        var correlationId = _correlationIdGenerator.Get();
+        ILogEventEnricher[] enrichers =
         {
-            new(JwtRegisteredClaimNames.Jti, Guid.CreateVersion7().ToString()),
-            new(JwtRegisteredClaimNames.Sub, request.Email),
-            new(JwtRegisteredClaimNames.Email, request.Email),
-            new("userid", request.UserId.ToString())
+            new PropertyEnricher("CorrelationId", correlationId.ToString())
         };
-        claims.AddRange(from claimPair in request.CustomClaims
-            let jsonElement = (JsonElement)claimPair.Value
-            let valueType = jsonElement.ValueKind switch
+
+        using (LogContext.Push(enrichers))
+        {
+            _logger.LogInformation("Generating token");
+            var validationResult = await _tokenValidator.ValidateAsync(request, cancellationToken);
+            if (!validationResult.IsValid)
             {
-                JsonValueKind.True => ClaimValueTypes.Boolean,
-                JsonValueKind.False => ClaimValueTypes.Boolean,
-                JsonValueKind.Number => ClaimValueTypes.Double,
-                _ => ClaimValueTypes.String
+                _logger.LogInformation("Invalid auth request");
+                return BadRequest(validationResult.ToDictionary());
             }
-            select new Claim(claimPair.Key, claimPair.Value.ToString()!, valueType));
 
-        var tokenDescriptor = new SecurityTokenDescriptor
-        {
-            Subject = new ClaimsIdentity(claims),
-            Expires = DateTime.UtcNow.Add(ApiConstants.TokenLifetime),
-            Issuer = "https://auth.ugverify.com",
-            Audience = "https://kyc.ugverify.com",
-            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-        };
-        
-        var token = tokenHandler.CreateToken(tokenDescriptor);
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.UTF8.GetBytes(ApiConstants.TokenSecret);
 
-        var jwt = tokenHandler.WriteToken(token);
+            var claims = new List<Claim>
+            {
+                new(JwtRegisteredClaimNames.Jti, Guid.CreateVersion7().ToString()),
+                new(JwtRegisteredClaimNames.Sub, request.Email),
+                new(JwtRegisteredClaimNames.Email, request.Email),
+                new("userid", request.UserId.ToString())
+            };
+            claims.AddRange(from claimPair in request.CustomClaims
+                let jsonElement = (JsonElement)claimPair.Value
+                let valueType = jsonElement.ValueKind switch
+                {
+                    JsonValueKind.True => ClaimValueTypes.Boolean,
+                    JsonValueKind.False => ClaimValueTypes.Boolean,
+                    JsonValueKind.Number => ClaimValueTypes.Double,
+                    _ => ClaimValueTypes.String
+                }
+                select new Claim(claimPair.Key, claimPair.Value.ToString()!, valueType));
 
-        var tokenResponse = new TokenResponse
-        {
-            AccessToken = jwt,
-            ExpiresIn = ApiConstants.TokenLifetime.TotalMinutes,
-        };
-        
-        return Ok(tokenResponse);
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(claims),
+                Expires = DateTime.UtcNow.Add(ApiConstants.TokenLifetime),
+                Issuer = "https://auth.ugverify.com",
+                Audience = "https://kyc.ugverify.com",
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
+                    SecurityAlgorithms.HmacSha256Signature)
+            };
+
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+
+            var jwt = tokenHandler.WriteToken(token);
+
+            var tokenResponse = new TokenResponse
+            {
+                AccessToken = jwt,
+                ExpiresIn = ApiConstants.TokenLifetime.TotalMinutes,
+            };
+            _logger.LogInformation("Finished generating a token");
+
+            return Ok(tokenResponse);
+        }
     }
 }
