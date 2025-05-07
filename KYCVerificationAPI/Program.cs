@@ -39,6 +39,13 @@ try
         {
             options.Title = "KYC Verification REST API";
             options.ShowSidebar = true;
+            options.WithPreferredScheme("Bearer");
+            options.AddHttpAuthentication("Bearer", 
+                auth =>
+            {
+                auth.Token = "ey...";
+            });
+            options.DefaultHttpClient = new KeyValuePair<ScalarTarget, ScalarClient>(ScalarTarget.CSharp, ScalarClient.HttpClient);
         });
     }
     
@@ -62,6 +69,7 @@ try
 
     app.UseApiExceptionHandler();
     
+    app.UseAuthentication();
     app.UseAuthorization();
     
     SeedData.Initialize(app);
@@ -71,6 +79,8 @@ try
         Authorization = [new HangfireAuthorizationFilter()]
     });
     
+    app.UseRateLimiter();
+
     app.MapControllers();
 
     app.Run();

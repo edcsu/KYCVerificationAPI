@@ -6,6 +6,7 @@ using KYCVerificationAPI.Core.Helpers;
 using KYCVerificationAPI.Features.Verifications.Requests;
 using KYCVerificationAPI.Features.Verifications.Responses;
 using KYCVerificationAPI.Features.Verifications.Service;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Scalar.AspNetCore;
 using Serilog.Context;
@@ -37,6 +38,7 @@ public class VerificationsController : ControllerBase
         _correlationIdGenerator = correlationIdGenerator;
     }
 
+    [Authorize(ApiConstants.TrustedUserPolicy)]
     [HttpPost]
     [Stability(Stability.Stable)]
     [ProducesResponseType(typeof(PendingResponse),StatusCodes.Status201Created, MediaTypeNames.Application.Json)]
@@ -77,6 +79,7 @@ public class VerificationsController : ControllerBase
         }
     }
     
+    [Authorize(ApiConstants.TrustedUserPolicy)]
     [HttpGet("{id:Guid}", Name = "GetById")]
     [ProducesResponseType(typeof(VerificationResponse), StatusCodes.Status200OK,MediaTypeNames.Application.Json)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

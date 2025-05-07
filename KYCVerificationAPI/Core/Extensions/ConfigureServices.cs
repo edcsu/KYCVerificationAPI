@@ -1,21 +1,28 @@
+using System.Text;
 using System.Text.Json.Serialization;
+using System.Threading.RateLimiting;
 using FluentValidation;
 using Hangfire;
 using Hangfire.PostgreSql;
 using KYCVerificationAPI.Core.Helpers;
 using KYCVerificationAPI.Data;
 using KYCVerificationAPI.Data.Repositories;
+using KYCVerificationAPI.Features.Auth.Requests;
+using KYCVerificationAPI.Features.Auth.Validators;
 using KYCVerificationAPI.Features.Scheduler.Services;
 using KYCVerificationAPI.Features.Vendors.Services;
 using KYCVerificationAPI.Features.Verifications.Requests;
 using KYCVerificationAPI.Features.Verifications.Service;
 using KYCVerificationAPI.Features.Verifications.Validators;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using Serilog;
 
 namespace KYCVerificationAPI.Core.Extensions;
 
@@ -71,7 +78,10 @@ public static class ConfigureServices
         });
 
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-        builder.Services.AddOpenApi();
+        builder.Services.AddOpenApi(options =>
+        {
+            options.AddDocumentTransformer<AuthSecuritySchemeTransformer>();
+        });
         
         builder.Services.AddScoped<IVerificationRepository, VerificationRepository>();
         
@@ -80,6 +90,8 @@ public static class ConfigureServices
         builder.Services.AddScoped<IExternalIdService, ExternalIdService>();
         
         builder.Services.AddScoped<IValidator<CreateVerification>, CreateVerificationValidator>();
+        
+        builder.Services.AddScoped<IValidator<TokenGenerationRequest>, TokenGenerationRequestValidator>();
         
         builder.Services.AddScoped<ICorrelationIdGenerator, CorrelationIdGenerator>();
         
@@ -130,5 +142,64 @@ public static class ConfigureServices
                 });
             });
         }
+        
+        var limitOptions = new RateLimitConfig();
+        builder.Configuration.GetSection(RateLimitConfig.SectionName).Bind(limitOptions);
+        
+        builder.Services.AddRateLimiter(options =>
+        {
+            options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
+            {
+                var path = context.Request.Path.Value ?? string.Empty;
+                var ipAddress = context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+                Log.Information("This request is coming from: {IpAddress}", ipAddress);
+
+                // if (!path.Contains("api", StringComparison.OrdinalIgnoreCase) ||
+                //     !path.Contains("scalar", StringComparison.OrdinalIgnoreCase) ||
+                //     !path.Contains("hangfire", StringComparison.OrdinalIgnoreCase))
+                // {
+                //     Log.Information("Rate limiting applied");
+                //     return RateLimitPartition.GetFixedWindowLimiter(
+                //         ipAddress,
+                //         partition => new FixedWindowRateLimiterOptions
+                //         {
+                //             PermitLimit = limitOptions.PermitLimit,             // 1 requests
+                //             Window = TimeSpan.FromMinutes(limitOptions.Window), // Per 5 minutes
+                //             QueueLimit = limitOptions.QueueLimit,              // Allow 5 requests in the queue
+                //             QueueProcessingOrder = QueueProcessingOrder.OldestFirst
+                //         });
+                // }
+
+                // Allow unlimited requests for "api" paths
+                Log.Information("No rate limiting applied");
+                return RateLimitPartition.GetNoLimiter(context.Connection.RemoteIpAddress?.ToString() ?? "unknown");
+            });
+        });
+        
+        var jwtConfig = config.GetJwtConfig();
+
+        builder.Services.AddAuthorizationBuilder()
+            .AddPolicy(ApiConstants.TrustedUserPolicy, p => p.RequireAssertion( a =>
+                a.User.HasClaim(c => c is { Type: ApiConstants.AdminUserClaim, Value: "true" }) ||
+                a.User.HasClaim(c => c is { Type: ApiConstants.ClientUserClaim, Value: "true" })));
+        
+        builder.Services.AddAuthentication(x =>
+        {
+            x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+        }).AddJwtBearer(x =>
+        {
+            x.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                ValidateLifetime = true,
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfig.Key!)),
+                ValidIssuer = jwtConfig.Issuer!,
+                ValidAudience = jwtConfig.Audience!,
+            };
+        });
     }
 }
