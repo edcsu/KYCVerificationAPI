@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using KYCVerificationAPI.Core;
+using KYCVerificationAPI.Features.Vendors.Responses;
 
 namespace KYCVerificationAPI.Features.Verifications.Responses;
 
@@ -22,8 +23,8 @@ public record VerificationData
     [Description("CardNumber of the holder on their National ID card")]
     public string CardNumber { get; init; } = string.Empty;
     
-    [Description("Status of the Verification")]
-    public VerificationStatus Status { get; init; }
+    [Description("KYC status of the Verification")]
+    public KycStatus KycStatus { get; init; }
     
     [Description("Match result of the names")]
     public bool? NameAsPerIdMatches { get; set; }
@@ -36,4 +37,8 @@ public record VerificationData
     
     [Description("Match result of the date of birth")]
     public bool? DateOfBirthMatches { get; set; }
+    
+    [Description("Verification message")]
+    public string? Remarks { get; set; }
+
 }

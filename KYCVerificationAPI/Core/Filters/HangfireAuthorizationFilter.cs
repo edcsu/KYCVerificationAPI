@@ -10,6 +10,6 @@ public class HangfireAuthorizationFilter : IDashboardAuthorizationFilter
 
         return true;
         // Allow all authenticated users to see the Dashboard.
-        return httpContext.User.Identity?.IsAuthenticated ?? false;
+        //return httpContext.User.Identity?.IsAuthenticated ?? false;
     }
 }

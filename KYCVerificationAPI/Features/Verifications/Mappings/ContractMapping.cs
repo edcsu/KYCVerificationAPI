@@ -28,6 +28,7 @@ public static class ContractMapping
             StatusCode = 200,
             CreatedAt = request.CreatedAt,
             UpdatedAt = request.LastUpdated,
+            Status = request.Status,
             Data = new VerificationData
             {
                 Nin = request.Nin,
@@ -35,11 +36,12 @@ public static class ContractMapping
                 FirstName = request.FirstName,
                 GivenName = request.GivenName,
                 DateOfBirth = request.DateOfBirth,
-                Status = request.Status,
+                KycStatus = request.KycStatus,
                 NinAsPerIdMatches = request.NinAsPerIdMatches,
                 NameAsPerIdMatches = request.NameAsPerIdMatches,
                 DateOfBirthMatches = request.DateOfBirthMatches,
-                CardNumberAsPerIdMatches = request.CardNumberAsPerIdMatches
+                CardNumberAsPerIdMatches = request.CardNumberAsPerIdMatches,
+                Remarks = request.KycMessage
             }
         };
     }

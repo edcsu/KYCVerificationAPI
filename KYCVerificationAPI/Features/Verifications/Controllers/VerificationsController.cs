@@ -19,15 +19,15 @@ namespace KYCVerificationAPI.Features.Verifications.Controllers;
 [ApiVersion(1)]
 [Consumes(MediaTypeNames.Application.Json)]
 [Produces(MediaTypeNames.Application.Json)]
-public class VerificationController : ControllerBase
+public class VerificationsController : ControllerBase
 {
     private readonly IVerificationService _verificationService;
-    private readonly ILogger<VerificationController> _logger;
+    private readonly ILogger<VerificationsController> _logger;
     private readonly IValidator<CreateVerification> _createValidator;
     private readonly ICorrelationIdGenerator _correlationIdGenerator;
     
-    public VerificationController(IVerificationService verificationService, 
-        ILogger<VerificationController> logger, 
+    public VerificationsController(IVerificationService verificationService, 
+        ILogger<VerificationsController> logger, 
         IValidator<CreateVerification> createValidator, 
         ICorrelationIdGenerator correlationIdGenerator)
     {
@@ -39,9 +39,11 @@ public class VerificationController : ControllerBase
 
     [HttpPost]
     [Stability(Stability.Stable)]
-    [ProducesResponseType(typeof(PendingResponse),StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(PendingResponse),StatusCodes.Status201Created, MediaTypeNames.Application.Json)]
+    [ProducesResponseType( StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [EndpointSummary("Creates a new verification.")]
+    [EndpointDescription("Creates a new verification request asynchronously.")]
     public async Task<IActionResult> CreateAsync([FromBody] CreateVerification request,
         CancellationToken token = default)
     {
@@ -76,10 +78,12 @@ public class VerificationController : ControllerBase
     }
     
     [HttpGet("{id:Guid}", Name = "GetById")]
-    [ProducesResponseType(typeof(VerificationResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(VerificationResponse), StatusCodes.Status200OK,MediaTypeNames.Application.Json)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [EndpointSummary("Returns verification details")]
+    [EndpointDescription("Returns details of a given verification request")]
     [Stability(Stability.Stable)]
     public async Task<IActionResult> GetByIdAsync([FromRoute] Guid id,
         CancellationToken token = default)

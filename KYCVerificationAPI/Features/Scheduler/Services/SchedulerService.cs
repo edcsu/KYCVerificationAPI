@@ -62,7 +62,8 @@ public class SchedulerService : ISchedulerService
             {
                 await HandleKycErrorResponse(request, cancellationToken);
             }
-            
+
+            request.Status = VerificationStatus.Success;
             request.KycStatus = kycResponse.KycStatus;
             request.CardNumberAsPerIdMatches = kycResponse.CardNumberAsPerIdMatches;
             request.DateOfBirthMatches = kycResponse.DateOfBirthMatches;
@@ -85,7 +86,7 @@ public class SchedulerService : ISchedulerService
     {
         if (request.Retries >= ApiConstants.MaxRetryAttempts)
         {
-            request.Status = VerificationStatus.Invalid;
+            request.Status = VerificationStatus.Failed;
             request.KycStatus = KycStatus.Error;
             var verificationRequest = await _verificationRepository.Update(request, cancellationToken);
             _logger.LogError("The verification request with ID {RequestId} has failed after {MaxRetries} retries", 

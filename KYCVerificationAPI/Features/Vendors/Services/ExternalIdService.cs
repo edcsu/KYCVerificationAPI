@@ -47,7 +47,7 @@ public class ExternalIdService : IExternalIdService
                             NinAsPerIdMatches = false,
                             DateOfBirthMatches = true,
                             CardNumberAsPerIdMatches = true,
-                            Message = "Verification failed"
+                            Message = "Verification failed due to nin mismatch"
                         };
                     
                     case FailedValue.Name:
@@ -58,7 +58,7 @@ public class ExternalIdService : IExternalIdService
                             NinAsPerIdMatches = true,
                             DateOfBirthMatches = true,
                             CardNumberAsPerIdMatches = true,
-                            Message = "Verification failed"
+                            Message = "Verification failed due to name mismatch"
                         };
                     
                     case FailedValue.Birth:
@@ -69,7 +69,7 @@ public class ExternalIdService : IExternalIdService
                             NinAsPerIdMatches = true,
                             DateOfBirthMatches = false,
                             CardNumberAsPerIdMatches = true,
-                            Message = "Verification failed"
+                            Message = "Verification failed due to date of birth mismatch"
                         };
                     
                     case FailedValue.CardNumber:
@@ -80,7 +80,7 @@ public class ExternalIdService : IExternalIdService
                             NinAsPerIdMatches = true,
                             DateOfBirthMatches = true,
                             CardNumberAsPerIdMatches = false,
-                            Message = "Verification failed"
+                            Message = "Verification failed due to card number mismatch"
                         };
                 }
             
@@ -90,9 +90,6 @@ public class ExternalIdService : IExternalIdService
                 return new KycResponse
                 {
                     KycStatus = KycStatus.Error,
-                    NameAsPerIdMatches = true,
-                    NinAsPerIdMatches = true,
-                    DateOfBirthMatches = true,
                     Message = "An error occured during verification"
                 };
         }

@@ -12,14 +12,14 @@ public record KycResponse
     public string? Message { get; init; }
     
     [Description("Match result of the names")]
-    public bool NameAsPerIdMatches { get; set; }
+    public bool? NameAsPerIdMatches { get; set; }
     
     [Description("Match result of the nin")]
-    public bool NinAsPerIdMatches { get; set; }
+    public bool? NinAsPerIdMatches { get; set; }
     
     [Description("Match result of the card number")]
-    public bool CardNumberAsPerIdMatches { get; set; }
+    public bool? CardNumberAsPerIdMatches { get; set; }
     
     [Description("Match result of the date of birth")]
-    public bool DateOfBirthMatches { get; set; }
+    public bool? DateOfBirthMatches { get; set; }
 }
