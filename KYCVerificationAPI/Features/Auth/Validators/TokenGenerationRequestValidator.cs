@@ -1,4 +1,5 @@
 using FluentValidation;
+using KYCVerificationAPI.Core;
 using KYCVerificationAPI.Features.Auth.Requests;
 
 namespace KYCVerificationAPI.Features.Auth.Validators;
@@ -15,7 +16,7 @@ public class TokenGenerationRequestValidator: AbstractValidator<TokenGenerationR
         
         RuleFor(request => request.CustomClaims)
             .NotEmpty()
-            .Must(claims => claims.ContainsKey("client"))
+            .Must(claims => claims.ContainsKey(ApiConstants.ClientUserClaim))
             .WithMessage("CustomClaims must contain a 'client' key");
     }
     

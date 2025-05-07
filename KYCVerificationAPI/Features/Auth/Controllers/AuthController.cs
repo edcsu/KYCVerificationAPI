@@ -6,9 +6,11 @@ using System.Text.Json;
 using Asp.Versioning;
 using FluentValidation;
 using KYCVerificationAPI.Core;
+using KYCVerificationAPI.Core.Extensions;
 using KYCVerificationAPI.Core.Helpers;
 using KYCVerificationAPI.Features.Auth.Requests;
 using KYCVerificationAPI.Features.Auth.Responses;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
@@ -28,15 +30,19 @@ public class AuthController: ControllerBase
     private readonly IValidator<TokenGenerationRequest> _tokenValidator;
     private readonly ILogger<AuthController> _logger;
     private readonly ICorrelationIdGenerator _correlationIdGenerator;
+    private readonly IConfiguration _configuration;
     public AuthController(IValidator<TokenGenerationRequest> tokenValidator, 
         ICorrelationIdGenerator correlationIdGenerator, 
-        ILogger<AuthController> logger)
+        ILogger<AuthController> logger, 
+        IConfiguration configuration)
     {
         _tokenValidator = tokenValidator;
         _correlationIdGenerator = correlationIdGenerator;
         _logger = logger;
+        _configuration = configuration;
     }
 
+    [AllowAnonymous]
     [HttpPost("token")]
     [Stability(Stability.Stable)]
     [ProducesResponseType(typeof(TokenResponse),StatusCodes.Status200OK, MediaTypeNames.Application.Json)]
@@ -62,9 +68,10 @@ public class AuthController: ControllerBase
                 _logger.LogInformation("Invalid auth request");
                 return BadRequest(validationResult.ToDictionary());
             }
+            var jwtConfig = _configuration.GetJwtConfig();
 
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.UTF8.GetBytes(ApiConstants.TokenSecret);
+            var key = Encoding.UTF8.GetBytes(jwtConfig.Key);
 
             var claims = new List<Claim>
             {
@@ -83,13 +90,13 @@ public class AuthController: ControllerBase
                     _ => ClaimValueTypes.String
                 }
                 select new Claim(claimPair.Key, claimPair.Value.ToString()!, valueType));
-
+            
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
                 Expires = DateTime.UtcNow.Add(ApiConstants.TokenLifetime),
-                Issuer = "https://auth.ugverify.com",
-                Audience = "https://kyc.ugverify.com",
+                Issuer = jwtConfig.Issuer,
+                Audience = jwtConfig.Audience,
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
                     SecurityAlgorithms.HmacSha256Signature)
             };

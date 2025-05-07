@@ -11,4 +11,9 @@ public static class ConfigExtensions
     {
         return configuration.GetSection(OtelConfing.ConfigName).Get<OtelConfing>();
     }
+    
+    public static JwtConfig GetJwtConfig(this IConfiguration configuration)
+    {
+        return configuration.GetSection(JwtConfig.ConfigName).Get<JwtConfig>();
+    }
 }

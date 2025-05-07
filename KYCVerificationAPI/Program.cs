@@ -62,6 +62,7 @@ try
 
     app.UseApiExceptionHandler();
     
+    app.UseAuthentication();
     app.UseAuthorization();
     
     SeedData.Initialize(app);
