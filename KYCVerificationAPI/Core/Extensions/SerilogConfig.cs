@@ -23,7 +23,7 @@ public static class SerilogConfig
                 lc.WriteTo.OpenTelemetry(options =>
                 {
                     options.Endpoint = otelConfing.Endpoint;
-                    options.Protocol = OtlpProtocol.HttpProtobuf;
+                    options.Protocol = OtlpProtocol.Grpc;
                     options.ResourceAttributes = new Dictionary<string, object>
                     {
                         ["service.name"] = ApiConstants.ApplicationName,

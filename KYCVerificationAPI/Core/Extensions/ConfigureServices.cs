@@ -11,6 +11,7 @@ using KYCVerificationAPI.Features.Verifications.Requests;
 using KYCVerificationAPI.Features.Verifications.Service;
 using KYCVerificationAPI.Features.Verifications.Validators;
 using Microsoft.EntityFrameworkCore;
+using OpenTelemetry.Exporter;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
@@ -98,6 +99,7 @@ public static class ConfigureServices
                     metric.AddOtlpExporter(options => 
                     {
                         options.Endpoint = new Uri(otelConfig.Endpoint);
+                        options.Protocol = OtlpExportProtocol.Grpc;
                     });
                 })
                 .WithTracing(trace =>
@@ -108,6 +110,7 @@ public static class ConfigureServices
                     trace.AddOtlpExporter(options =>
                     {
                         options.Endpoint = new Uri(otelConfig.Endpoint);
+                        options.Protocol = OtlpExportProtocol.Grpc;
                     });
                 });
                 
@@ -123,6 +126,7 @@ public static class ConfigureServices
                 options.AddOtlpExporter(otlpExporterOptions =>
                 {
                     otlpExporterOptions.Endpoint = new Uri(otelConfig.Endpoint);
+                    otlpExporterOptions.Protocol = OtlpExportProtocol.Grpc;
                 });
             });
         }
