@@ -61,4 +61,19 @@ public class VerificationRepositoryIntegrationTests : IClassFixture<DatabaseFixt
         Assert.NotNull(result);
         Assert.Equal(expectedVerification, result);
     }
+    
+    [Fact]
+    public async Task GetAll_ShouldReturnAllVerifications()
+    {
+        // Arrange
+        var newVerification = IntegrationHelpers.GetVerification();
+        var savedVerification = await _verificationRepository.Add(newVerification);
+
+        // Act
+        var result = await _verificationRepository.GetAll(CancellationToken.None);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Single( result);
+    }
 }
