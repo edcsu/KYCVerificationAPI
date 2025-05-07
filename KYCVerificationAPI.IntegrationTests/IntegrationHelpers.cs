@@ -13,7 +13,7 @@ public static class IntegrationHelpers
         var requestFaker = new Faker<Verification>()
             .RuleFor(r => r.CreatedBy, f => f.Person.Email)
             .RuleFor(r => r.FirstName, f => f.Name.FirstName())
-            .RuleFor(r => r.GivenName, f => f.Name.LastName())
+            .RuleFor(r => r.GivenName, f => f.Name.FirstName())
             .RuleFor(r => r.Id, f => f.Random.Guid())
             .RuleFor(r => r.Nin, f => f.Random.AlphaNumeric(14))
             .RuleFor(r => r.CardNumber, f => f.Random.AlphaNumeric(9))
