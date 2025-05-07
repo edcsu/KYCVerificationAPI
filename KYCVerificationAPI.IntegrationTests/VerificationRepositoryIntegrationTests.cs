@@ -76,4 +76,17 @@ public class VerificationRepositoryIntegrationTests : IClassFixture<DatabaseFixt
         Assert.NotNull(result);
         Assert.Single( result);
     }
+    
+    [Fact]
+    public async Task GetById_ShouldReturnNull_WhenVerificationDoesNotExist()
+    {
+        // Arrange
+        var expectedId = Guid.NewGuid();
+
+        // Act
+        var result = await _verificationRepository.GetByIdAsync(expectedId, CancellationToken.None);
+
+        // Assert
+        Assert.Null(result);
+    }
 }
