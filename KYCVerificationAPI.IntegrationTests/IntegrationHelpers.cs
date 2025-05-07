@@ -17,7 +17,7 @@ public static class IntegrationHelpers
             .RuleFor(r => r.Id, f => f.Random.Guid())
             .RuleFor(r => r.Nin, f => f.Random.AlphaNumeric(14))
             .RuleFor(r => r.CardNumber, f => f.Random.AlphaNumeric(9))
-            .RuleFor(r => r.KycMessage, f => f.Random.Words(5))
+            .RuleFor(r => r.KycMessage, f => f.Random.AlphaNumeric(10))
             .RuleFor(r => r.KycStatus, f => f.PickRandom<KycStatus>())
             .RuleFor(r => r.Status, f => f.PickRandom<VerificationStatus>())
             .RuleFor(r => r.CorrelationId, f => f.Random.Guid().ToString())

@@ -25,7 +25,7 @@ public class DatabaseFixture : IAsyncLifetime
             .Options;
 
         DbContext = new AppDbContext(options);
-        await DbContext.Database.EnsureCreatedAsync();
+        await DbContext.Database.MigrateAsync();
     }
 
     public async Task DisposeAsync()
@@ -35,7 +35,7 @@ public class DatabaseFixture : IAsyncLifetime
 
     public async Task ResetDatabaseAsync()
     {
-        // Optional: Clear tables between tests for isolation
+        // Clear tables between tests for isolation
         DbContext.Verifications.RemoveRange(DbContext.Verifications);
         await DbContext.SaveChangesAsync();
     }

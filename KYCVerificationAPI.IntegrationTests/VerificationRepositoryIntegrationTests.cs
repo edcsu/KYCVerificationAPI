@@ -29,4 +29,21 @@ public class VerificationRepositoryIntegrationTests : IClassFixture<DatabaseFixt
         Assert.NotNull(result);
         Assert.Equal(newVerification, result);
     }
+    
+    [Fact]
+    public async Task Update_ShouldUpdateExistingVerification()
+    {
+        // Arrange
+        var newVerification = IntegrationHelpers.GetVerification();
+        var savedVerification = await _verificationRepository.Add(newVerification);
+
+        const string newMessage = "The KYC is valid";
+        savedVerification.KycMessage = newMessage;
+        // Act
+        var result = await _verificationRepository.Update(savedVerification);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(newMessage, result.KycMessage);
+    }
 }
