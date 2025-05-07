@@ -1,9 +1,16 @@
 using System.Text.Json.Serialization;
 using FluentValidation;
+using Hangfire;
+using Hangfire.PostgreSql;
+using KYCVerificationAPI.Core.Helpers;
+using KYCVerificationAPI.Data;
+using KYCVerificationAPI.Data.Repositories;
+using KYCVerificationAPI.Features.Scheduler.Services;
 using KYCVerificationAPI.Features.Vendors.Services;
 using KYCVerificationAPI.Features.Verifications.Requests;
 using KYCVerificationAPI.Features.Verifications.Service;
 using KYCVerificationAPI.Features.Verifications.Validators;
+using Microsoft.EntityFrameworkCore;
 
 namespace KYCVerificationAPI.Core.Extensions;
 
@@ -11,6 +18,28 @@ public static class ConfigureServices
 {
     public static void AddApiServices(this WebApplicationBuilder builder)
     {
+        var config = builder.Configuration;
+        builder.Services.AddDbContext<AppDbContext>(options =>
+        {
+            options.UseNpgsql(config.GetConnectionString("DefaultConnection"), 
+                opts =>
+            {
+                opts.EnableRetryOnFailure();
+            });
+        });
+        
+        builder.Services.AddHangfire(configuration =>
+            configuration.
+                SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+                .UseColouredConsoleLogProvider()
+                .UseSimpleAssemblyNameTypeSerializer()
+                .UseRecommendedSerializerSettings()
+                .UsePostgreSqlStorage(c =>
+                    c.UseNpgsqlConnection(config.GetConnectionString("DefaultConnection")))
+        );
+            
+        builder.Services.AddHangfireServer();
+        
         builder.Services.AddCors(options =>
         {
             options.AddPolicy(ApiConstants.AllowedClients, policy =>
@@ -37,11 +66,16 @@ public static class ConfigureServices
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         builder.Services.AddOpenApi();
         
-        builder.Services.AddTransient<IVerificationService, VerificationService>();
+        builder.Services.AddScoped<IVerificationRepository, VerificationRepository>();
+        
+        builder.Services.AddScoped<IVerificationService, VerificationService>();
 
         builder.Services.AddScoped<IExternalIdService, ExternalIdService>();
         
         builder.Services.AddScoped<IValidator<CreateVerification>, CreateVerificationValidator>();
-
+        
+        builder.Services.AddScoped<ICorrelationIdGenerator, CorrelationIdGenerator>();
+        
+        builder.Services.AddScoped<ISchedulerService, SchedulerService>();
     }
 }
