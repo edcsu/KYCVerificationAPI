@@ -153,22 +153,20 @@ public static class ConfigureServices
                 var path = context.Request.Path.Value ?? string.Empty;
                 var ipAddress = context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
                 Log.Information("This request is coming from: {IpAddress}", ipAddress);
-
-                // if (!path.Contains("api", StringComparison.OrdinalIgnoreCase) ||
-                //     !path.Contains("scalar", StringComparison.OrdinalIgnoreCase) ||
-                //     !path.Contains("hangfire", StringComparison.OrdinalIgnoreCase))
-                // {
-                //     Log.Information("Rate limiting applied");
-                //     return RateLimitPartition.GetFixedWindowLimiter(
-                //         ipAddress,
-                //         partition => new FixedWindowRateLimiterOptions
-                //         {
-                //             PermitLimit = limitOptions.PermitLimit,             // 1 requests
-                //             Window = TimeSpan.FromMinutes(limitOptions.Window), // Per 5 minutes
-                //             QueueLimit = limitOptions.QueueLimit,              // Allow 5 requests in the queue
-                //             QueueProcessingOrder = QueueProcessingOrder.OldestFirst
-                //         });
-                // }
+                
+                if (!ApiConstants.AllowedPaths.Any(allowedPath => path.Contains(allowedPath, StringComparison.OrdinalIgnoreCase)))
+                {
+                    Log.Information("Rate limiting applied");
+                    return RateLimitPartition.GetFixedWindowLimiter(
+                        ipAddress,
+                        partition => new FixedWindowRateLimiterOptions
+                        {
+                            PermitLimit = limitOptions.PermitLimit,             // 1 requests
+                            Window = TimeSpan.FromSeconds(limitOptions.Window), // Per 5 seconds
+                            QueueLimit = limitOptions.QueueLimit,              // Allow 15 requests in the queue
+                            QueueProcessingOrder = QueueProcessingOrder.OldestFirst
+                        });
+                }
 
                 // Allow unlimited requests for "api" paths
                 Log.Information("No rate limiting applied");
