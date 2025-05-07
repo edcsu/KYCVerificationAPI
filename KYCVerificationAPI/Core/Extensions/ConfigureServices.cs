@@ -11,6 +11,10 @@ using KYCVerificationAPI.Features.Verifications.Requests;
 using KYCVerificationAPI.Features.Verifications.Service;
 using KYCVerificationAPI.Features.Verifications.Validators;
 using Microsoft.EntityFrameworkCore;
+using OpenTelemetry.Logs;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 
 namespace KYCVerificationAPI.Core.Extensions;
 
@@ -19,6 +23,8 @@ public static class ConfigureServices
     public static void AddApiServices(this WebApplicationBuilder builder)
     {
         var config = builder.Configuration;
+        var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? string.Empty;
+        
         builder.Services.AddDbContext<AppDbContext>(options =>
         {
             options.UseNpgsql(config.GetConnectionString("DefaultConnection"), 
@@ -77,5 +83,48 @@ public static class ConfigureServices
         builder.Services.AddScoped<ICorrelationIdGenerator, CorrelationIdGenerator>();
         
         builder.Services.AddScoped<ISchedulerService, SchedulerService>();
+        
+        var otelConfig = config.GetOtelConfing();
+
+        if (otelConfig.Enabled)
+        {
+            builder.Services.AddOpenTelemetry()
+                .ConfigureResource(resource => resource.AddService(ApiConstants.ApplicationName))
+                .WithMetrics(metric =>
+                {
+                    metric.AddAspNetCoreInstrumentation()
+                        .AddHttpClientInstrumentation();
+
+                    metric.AddOtlpExporter(options => 
+                    {
+                        options.Endpoint = new Uri(otelConfig.Endpoint);
+                    });
+                })
+                .WithTracing(trace =>
+                {
+                    trace.AddAspNetCoreInstrumentation()
+                        .AddHttpClientInstrumentation();
+
+                    trace.AddOtlpExporter(options =>
+                    {
+                        options.Endpoint = new Uri(otelConfig.Endpoint);
+                    });
+                });
+                
+            builder.Logging.AddOpenTelemetry(options => 
+            {
+                if (environment == Environments.Development)
+                {
+                    options.AddConsoleExporter()
+                        .SetResourceBuilder(ResourceBuilder.CreateDefault()
+                            .AddService(ApiConstants.ApplicationName));
+                }
+
+                options.AddOtlpExporter(otlpExporterOptions =>
+                {
+                    otlpExporterOptions.Endpoint = new Uri(otelConfig.Endpoint);
+                });
+            });
+        }
     }
 }
