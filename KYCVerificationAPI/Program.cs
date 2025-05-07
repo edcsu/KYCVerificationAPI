@@ -1,6 +1,8 @@
-using System.Text.Json.Serialization;
+using Hangfire;
 using KYCVerificationAPI.Core;
 using KYCVerificationAPI.Core.Extensions;
+using KYCVerificationAPI.Core.Filters;
+using KYCVerificationAPI.Data;
 using Scalar.AspNetCore;
 using Serilog;
 using Serilog.Events;
@@ -52,12 +54,23 @@ try
         };
     });
     
+    app.AddCorrelationIdMiddleware();
+    
     app.UseHttpsRedirection();
 
+    app.UseRouting();
+
     app.UseApiExceptionHandler();
-
+    
     app.UseAuthorization();
-
+    
+    SeedData.Initialize(app);
+    
+    app.UseHangfireDashboard("/hangfire", new DashboardOptions
+    {
+        Authorization = [new HangfireAuthorizationFilter()]
+    });
+    
     app.MapControllers();
 
     app.Run();

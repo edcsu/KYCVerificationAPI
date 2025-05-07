@@ -6,4 +6,5 @@ public static class ApiConstants
     public const string AllowAll = "*";
     public const string AllowedHosts = "AllowedHosts";
     public const string ApplicationName = "KYCVerificationAPI";
+    public const int MaxRetryAttempts = 5;
 }

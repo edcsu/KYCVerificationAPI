@@ -1,3 +1,4 @@
+using Hangfire;
 using KYCVerificationAPI.Core.Helpers;
 using KYCVerificationAPI.Features.Vendors.Requests;
 using KYCVerificationAPI.Features.Vendors.Responses;
@@ -13,6 +14,7 @@ public class ExternalIdService : IExternalIdService
         _logger = logger;
     }
 
+    [AutomaticRetry(Attempts = 5, DelaysInSeconds = [2, 1, 3, 2, 4])]
     public async Task<KycResponse> VerifyAsync(KycRequest request, MockMode mockMode)
     {
         switch (mockMode)
@@ -20,7 +22,7 @@ public class ExternalIdService : IExternalIdService
             case MockMode.Success:
             default:
                 _logger.LogInformation("Verification was a success");
-                await Task.Delay(3000);
+                await Task.Delay(1000);
                 return new KycResponse
                 {
                     KycStatus = KycStatus.Ok,
@@ -33,7 +35,7 @@ public class ExternalIdService : IExternalIdService
             case MockMode.Failed:
                 _logger.LogInformation("Verification failed");
                 var randomFailedValue = EnumHelper.GetRandomEnumValue<FailedValue>();
-                await Task.Delay(5000);
+                await Task.Delay(3000);
                 switch (randomFailedValue)
                 {
                     case FailedValue.Nin:
@@ -45,8 +47,9 @@ public class ExternalIdService : IExternalIdService
                             NinAsPerIdMatches = false,
                             DateOfBirthMatches = true,
                             CardNumberAsPerIdMatches = true,
-                            Message = "Verification failed"
+                            Message = "Verification failed due to nin mismatch"
                         };
+                    
                     case FailedValue.Name:
                         return new KycResponse
                         {
@@ -55,8 +58,9 @@ public class ExternalIdService : IExternalIdService
                             NinAsPerIdMatches = true,
                             DateOfBirthMatches = true,
                             CardNumberAsPerIdMatches = true,
-                            Message = "Verification failed"
+                            Message = "Verification failed due to name mismatch"
                         };
+                    
                     case FailedValue.Birth:
                         return new KycResponse
                         {
@@ -65,8 +69,9 @@ public class ExternalIdService : IExternalIdService
                             NinAsPerIdMatches = true,
                             DateOfBirthMatches = false,
                             CardNumberAsPerIdMatches = true,
-                            Message = "Verification failed"
+                            Message = "Verification failed due to date of birth mismatch"
                         };
+                    
                     case FailedValue.CardNumber:
                         return new KycResponse
                         {
@@ -75,19 +80,16 @@ public class ExternalIdService : IExternalIdService
                             NinAsPerIdMatches = true,
                             DateOfBirthMatches = true,
                             CardNumberAsPerIdMatches = false,
-                            Message = "Verification failed"
+                            Message = "Verification failed due to card number mismatch"
                         };
                 }
             
             case MockMode.Error:
                 _logger.LogInformation("An error occured during verification");
-                await Task.Delay(2000);
+                await Task.Delay(3000);
                 return new KycResponse
                 {
                     KycStatus = KycStatus.Error,
-                    NameAsPerIdMatches = true,
-                    NinAsPerIdMatches = true,
-                    DateOfBirthMatches = true,
                     Message = "An error occured during verification"
                 };
         }
