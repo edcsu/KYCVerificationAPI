@@ -59,8 +59,6 @@ try
     app.UseHttpsRedirection();
 
     app.UseRouting();
-    
-    app.UseStaticFiles();
 
     app.UseApiExceptionHandler();
     

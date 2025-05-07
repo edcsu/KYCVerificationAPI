@@ -1,3 +1,4 @@
+using Hangfire;
 using KYCVerificationAPI.Core.Helpers;
 using KYCVerificationAPI.Features.Vendors.Requests;
 using KYCVerificationAPI.Features.Vendors.Responses;
@@ -13,6 +14,7 @@ public class ExternalIdService : IExternalIdService
         _logger = logger;
     }
 
+    [AutomaticRetry(Attempts = 5, DelaysInSeconds = [2, 1, 3, 2, 4])]
     public async Task<KycResponse> VerifyAsync(KycRequest request, MockMode mockMode)
     {
         switch (mockMode)
