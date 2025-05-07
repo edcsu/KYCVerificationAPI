@@ -78,7 +78,10 @@ public static class ConfigureServices
         });
 
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-        builder.Services.AddOpenApi();
+        builder.Services.AddOpenApi(options =>
+        {
+            options.AddDocumentTransformer<AuthSecuritySchemeTransformer>();
+        });
         
         builder.Services.AddScoped<IVerificationRepository, VerificationRepository>();
         

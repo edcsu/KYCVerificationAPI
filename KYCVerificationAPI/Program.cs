@@ -39,6 +39,13 @@ try
         {
             options.Title = "KYC Verification REST API";
             options.ShowSidebar = true;
+            options.WithPreferredScheme("Bearer");
+            options.AddHttpAuthentication("Bearer", 
+                auth =>
+            {
+                auth.Token = "ey...";
+            });
+            options.DefaultHttpClient = new KeyValuePair<ScalarTarget, ScalarClient>(ScalarTarget.CSharp, ScalarClient.HttpClient);
         });
     }
     
