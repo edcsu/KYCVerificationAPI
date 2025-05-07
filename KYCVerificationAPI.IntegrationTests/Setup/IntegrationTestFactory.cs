@@ -10,7 +10,7 @@ using Microsoft.VisualStudio.TestPlatform.TestHost;
 using Respawn;
 using Testcontainers.PostgreSql;
 
-namespace KYCVerificationAPI.IntegrationTests;
+namespace KYCVerificationAPI.IntegrationTests.Setup;
 
 [CollectionDefinition(nameof(DatabaseTestCollection))]
 public class DatabaseTestCollection : ICollectionFixture<IntegrationTestFactory>
