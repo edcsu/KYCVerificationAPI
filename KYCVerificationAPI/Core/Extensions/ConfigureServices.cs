@@ -1,5 +1,7 @@
 using System.Text.Json.Serialization;
 using FluentValidation;
+using Hangfire;
+using Hangfire.PostgreSql;
 using KYCVerificationAPI.Core.Helpers;
 using KYCVerificationAPI.Data;
 using KYCVerificationAPI.Data.Repositories;
@@ -16,14 +18,27 @@ public static class ConfigureServices
 {
     public static void AddApiServices(this WebApplicationBuilder builder)
     {
+        var config = builder.Configuration;
         builder.Services.AddDbContext<AppDbContext>(options =>
         {
-            options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"), 
+            options.UseNpgsql(config.GetConnectionString("DefaultConnection"), 
                 opts =>
             {
                 opts.EnableRetryOnFailure();
             });
         });
+        
+        builder.Services.AddHangfire(configuration =>
+            configuration.
+                SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+                .UseColouredConsoleLogProvider()
+                .UseSimpleAssemblyNameTypeSerializer()
+                .UseRecommendedSerializerSettings()
+                .UsePostgreSqlStorage(c =>
+                    c.UseNpgsqlConnection(config.GetConnectionString("DefaultConnection")))
+        );
+            
+        builder.Services.AddHangfireServer();
         
         builder.Services.AddCors(options =>
         {

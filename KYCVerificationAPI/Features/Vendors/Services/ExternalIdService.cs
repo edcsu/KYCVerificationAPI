@@ -20,7 +20,7 @@ public class ExternalIdService : IExternalIdService
             case MockMode.Success:
             default:
                 _logger.LogInformation("Verification was a success");
-                await Task.Delay(3000);
+                await Task.Delay(1000);
                 return new KycResponse
                 {
                     KycStatus = KycStatus.Ok,
@@ -33,7 +33,7 @@ public class ExternalIdService : IExternalIdService
             case MockMode.Failed:
                 _logger.LogInformation("Verification failed");
                 var randomFailedValue = EnumHelper.GetRandomEnumValue<FailedValue>();
-                await Task.Delay(5000);
+                await Task.Delay(3000);
                 switch (randomFailedValue)
                 {
                     case FailedValue.Nin:
@@ -47,6 +47,7 @@ public class ExternalIdService : IExternalIdService
                             CardNumberAsPerIdMatches = true,
                             Message = "Verification failed"
                         };
+                    
                     case FailedValue.Name:
                         return new KycResponse
                         {
@@ -57,6 +58,7 @@ public class ExternalIdService : IExternalIdService
                             CardNumberAsPerIdMatches = true,
                             Message = "Verification failed"
                         };
+                    
                     case FailedValue.Birth:
                         return new KycResponse
                         {
@@ -67,6 +69,7 @@ public class ExternalIdService : IExternalIdService
                             CardNumberAsPerIdMatches = true,
                             Message = "Verification failed"
                         };
+                    
                     case FailedValue.CardNumber:
                         return new KycResponse
                         {
@@ -81,7 +84,7 @@ public class ExternalIdService : IExternalIdService
             
             case MockMode.Error:
                 _logger.LogInformation("An error occured during verification");
-                await Task.Delay(2000);
+                await Task.Delay(3000);
                 return new KycResponse
                 {
                     KycStatus = KycStatus.Error,

@@ -1,5 +1,7 @@
+using Hangfire;
 using KYCVerificationAPI.Core;
 using KYCVerificationAPI.Core.Extensions;
+using KYCVerificationAPI.Core.Filters;
 using KYCVerificationAPI.Data;
 using Scalar.AspNetCore;
 using Serilog;
@@ -56,11 +58,20 @@ try
     
     app.UseHttpsRedirection();
 
+    app.UseRouting();
+    
+    app.UseStaticFiles();
+
     app.UseApiExceptionHandler();
-
+    
     app.UseAuthorization();
-
+    
     SeedData.Initialize(app);
+    
+    app.UseHangfireDashboard("/hangfire", new DashboardOptions
+    {
+        Authorization = [new HangfireAuthorizationFilter()]
+    });
     
     app.MapControllers();
 
