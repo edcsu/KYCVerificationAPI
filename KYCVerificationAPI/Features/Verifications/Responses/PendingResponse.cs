@@ -16,4 +16,7 @@ public record PendingResponse
     
     [Description("The time the verification was created")]
     public required DateTime CreatedAt { get; init; }
+    
+    [Description("The creator of the verification")]
+    public required string CreatedBy { get; init; }
 }

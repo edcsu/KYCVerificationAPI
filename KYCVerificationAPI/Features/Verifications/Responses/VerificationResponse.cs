@@ -20,5 +20,7 @@ public record VerificationResponse
     [Description("The time the verification was updated")]
     public DateTime? UpdatedAt { get; init; }
 
+    [Description("The creator of the verification")]
+    public required string CreatedBy { get; init; }
     public VerificationData Data { get; init; } = new VerificationData();
 }

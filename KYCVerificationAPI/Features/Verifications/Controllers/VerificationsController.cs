@@ -1,4 +1,5 @@
 using System.Net.Mime;
+using System.Security.Claims;
 using Asp.Versioning;
 using FluentValidation;
 using KYCVerificationAPI.Core;
@@ -51,9 +52,17 @@ public class VerificationsController : ControllerBase
     {
         var correlationId = _correlationIdGenerator.Get();
         ILogEventEnricher[] enrichers =
+        [
+            new PropertyEnricher("CorrelationId", correlationId)
+        ];
+        
+        var emailClaim = HttpContext.User.Claims.FirstOrDefault(it => it.Type == ClaimTypes.Email);
+        if (emailClaim is null)
         {
-            new PropertyEnricher("CorrelationId", correlationId.ToString())
-        };
+            _logger.LogError("Invalid email claim");
+            return Forbid();
+        }
+        var email = emailClaim.Value;
         
         using (LogContext.Push(enrichers))
         {
@@ -65,17 +74,18 @@ public class VerificationsController : ControllerBase
                 return BadRequest(validationResult.ToDictionary());
             }
 
-            var result = await _verificationService.CreateAsync(request, correlationId, token);
+            var verificationResponse = await _verificationService.CreateAsync(request, correlationId, email, token);
             var pendingResponse = new PendingResponse
             {
                 Code = 201,
                 Status = VerificationStatus.Pending,
-                CreatedAt = DateTime.UtcNow,
-                TransactionId = result
+                CreatedAt = verificationResponse.CreatedAt,
+                TransactionId = verificationResponse.TransactionId,
+                CreatedBy = verificationResponse.CreatedBy,
             };
 
             _logger.LogInformation("Finished creating a verification");
-            return Created($"api/verifications/{result}", pendingResponse);
+            return Created($"api/verifications/{verificationResponse.TransactionId}", pendingResponse);
         }
     }
     
@@ -93,9 +103,9 @@ public class VerificationsController : ControllerBase
     {
         var correlationId = _correlationIdGenerator.Get();
         ILogEventEnricher[] enrichers =
-        {
-            new PropertyEnricher("CorrelationId", correlationId.ToString())
-        };
+        [
+            new PropertyEnricher("CorrelationId", correlationId)
+        ];
 
         using (LogContext.Push(enrichers))
         {

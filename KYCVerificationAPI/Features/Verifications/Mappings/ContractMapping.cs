@@ -28,6 +28,7 @@ public static class ContractMapping
             StatusCode = 200,
             CreatedAt = request.CreatedAt,
             UpdatedAt = request.LastUpdated,
+            CreatedBy = request.CreatedBy,
             Status = request.Status,
             Data = new VerificationData
             {
