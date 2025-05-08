@@ -26,17 +26,19 @@ public class VerificationsController : ControllerBase
     private readonly IVerificationService _verificationService;
     private readonly ILogger<VerificationsController> _logger;
     private readonly IValidator<CreateVerification> _createValidator;
+    private readonly IValidator<VerificationFilter> _verificationFilterValidator;
     private readonly ICorrelationIdGenerator _correlationIdGenerator;
     
     public VerificationsController(IVerificationService verificationService, 
         ILogger<VerificationsController> logger, 
         IValidator<CreateVerification> createValidator, 
-        ICorrelationIdGenerator correlationIdGenerator)
+        ICorrelationIdGenerator correlationIdGenerator, IValidator<VerificationFilter> verificationFilterValidator)
     {
         _verificationService = verificationService;
         _logger = logger;
         _createValidator = createValidator;
         _correlationIdGenerator = correlationIdGenerator;
+        _verificationFilterValidator = verificationFilterValidator;
     }
 
     [Authorize(ApiConstants.TrustedUserPolicy)]
@@ -156,6 +158,13 @@ public class VerificationsController : ControllerBase
         [
             new PropertyEnricher("CorrelationId", correlationId)
         ];
+        
+        var validationResult = await _verificationFilterValidator.ValidateAsync(verificationFilter, token);
+        if (!validationResult.IsValid)
+        {
+            _logger.LogInformation("Invalid verification history request");
+            return BadRequest(validationResult.ToDictionary());
+        }
 
         using (LogContext.Push(enrichers))
         {

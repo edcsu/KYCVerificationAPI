@@ -93,6 +93,8 @@ public static class ConfigureServices
         
         builder.Services.AddScoped<IValidator<TokenGenerationRequest>, TokenGenerationRequestValidator>();
         
+        builder.Services.AddScoped<IValidator<VerificationFilter>, VerificationFilterValidator>();
+        
         builder.Services.AddScoped<ICorrelationIdGenerator, CorrelationIdGenerator>();
         
         builder.Services.AddScoped<ISchedulerService, SchedulerService>();
@@ -180,7 +182,8 @@ public static class ConfigureServices
         var jwtConfig = config.GetJwtConfig();
 
         builder.Services.AddAuthorizationBuilder()
-            .AddPolicy(ApiConstants.TrustedUserPolicy, p => p.RequireAssertion( a =>
+            .AddPolicy(ApiConstants.TrustedUserPolicy, p => 
+                p.RequireAssertion( a =>
                 a.User.HasClaim(c => c is { Type: ApiConstants.AdminUserClaim, Value: "true" }) ||
                 a.User.HasClaim(c => c is { Type: ApiConstants.ClientUserClaim, Value: "true" })));
         

@@ -1,6 +1,7 @@
 using KYCVerificationAPI.Core;
 using KYCVerificationAPI.Core.Extensions;
 using KYCVerificationAPI.Data.Entities;
+using KYCVerificationAPI.Features.Vendors.Responses;
 using KYCVerificationAPI.Features.Verifications.Mappings;
 using KYCVerificationAPI.Features.Verifications.Requests;
 using KYCVerificationAPI.Features.Verifications.Responses;
@@ -55,8 +56,19 @@ public class VerificationRepository : IVerificationRepository
         
         query = query.Where(v => v.CreatedBy == userEmail);
 
-        if (!string.IsNullOrWhiteSpace(verificationFilter.Nin))
-            query = query.Where(v => v.Nin.Contains(verificationFilter.Nin));
+        if (verificationFilter.TransactionId.HasValue)
+            query = query.Where(v => v.Id == verificationFilter.TransactionId);
+        
+        if (verificationFilter.DateOfBirth.HasValue)
+            query = query.Where(v => v.DateOfBirth == verificationFilter.DateOfBirth);
+        
+        if (!string.IsNullOrWhiteSpace(verificationFilter.Status) && 
+            Enum.TryParse<VerificationStatus>(verificationFilter.Status, true, out var status))
+            query = query.Where(v => v.Status == status);
+        
+        if (!string.IsNullOrWhiteSpace(verificationFilter.KycStatus) && 
+            Enum.TryParse<KycStatus>(verificationFilter.KycStatus, true,out var kycStatus))
+            query = query.Where(v => v.KycStatus == kycStatus);
         
         if (!string.IsNullOrWhiteSpace(verificationFilter.CardNumber))
             query = query.Where(v => v.CardNumber.Contains(verificationFilter.CardNumber));
@@ -78,6 +90,16 @@ public class VerificationRepository : IVerificationRepository
         
         if (verificationFilter.DateOfBirthMatches.HasValue)
             query = query.Where(v => v.NameAsPerIdMatches == verificationFilter.DateOfBirthMatches);
+        
+        if (verificationFilter.From.HasValue)
+        {
+            query = query.Where(r => DateOnly.FromDateTime(r.CreatedAt) >= verificationFilter.From);
+        }
+
+        if (verificationFilter.To.HasValue)
+        {
+            query = query.Where(r => DateOnly.FromDateTime(r.CreatedAt) <= verificationFilter.To);
+        }
 
         var total = await query.CountAsync(cancellationToken);
 
