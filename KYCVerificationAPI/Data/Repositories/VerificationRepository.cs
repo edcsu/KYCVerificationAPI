@@ -1,5 +1,9 @@
+using KYCVerificationAPI.Core;
+using KYCVerificationAPI.Core.Extensions;
 using KYCVerificationAPI.Data.Entities;
+using KYCVerificationAPI.Features.Verifications.Mappings;
 using KYCVerificationAPI.Features.Verifications.Requests;
+using KYCVerificationAPI.Features.Verifications.Responses;
 using Microsoft.EntityFrameworkCore;
 
 namespace KYCVerificationAPI.Data.Repositories;
@@ -43,8 +47,8 @@ public class VerificationRepository : IVerificationRepository
         return verification;
     }
 
-    public async Task<IEnumerable<Verification>> GetHistoryAsync(VerificationFilter verificationFilter,
-        string userEmail, 
+    public async Task<PagedResult<VerificationResponse>> GetHistoryAsync(VerificationFilter verificationFilter,
+        string userEmail,
         CancellationToken cancellationToken = default)
     {
         var query = _context.Verifications.AsQueryable();
@@ -56,10 +60,16 @@ public class VerificationRepository : IVerificationRepository
 
         var results = await query
             .OrderByDescending(v => v.CreatedAt)
-            .Skip((verificationFilter.Page - 1) * verificationFilter.PageSize)
-            .Take(verificationFilter.PageSize)
+            .ApplyPaging(verificationFilter.Page, verificationFilter.PageSize)
             .ToListAsync(cancellationToken);
-        
-        return results;
+
+        var verificationResponses = results.Select(it => it.MapToVerificationResponse());
+        return new PagedResult<VerificationResponse>
+        {
+            Items = verificationResponses,
+            TotalItems = total,
+            Page = verificationFilter.Page,
+            PageSize = verificationFilter.PageSize
+        };
     }
 }
