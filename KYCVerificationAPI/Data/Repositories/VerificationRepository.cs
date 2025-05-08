@@ -58,12 +58,12 @@ public class VerificationRepository : IVerificationRepository
 
         var total = await query.CountAsync(cancellationToken);
 
-        var results = await query
+        var verificationResponses = await query
             .OrderByDescending(v => v.CreatedAt)
             .ApplyPaging(verificationFilter.Page, verificationFilter.PageSize)
+            .Select(it => it.MapToVerificationResponse())
             .ToListAsync(cancellationToken);
-
-        var verificationResponses = results.Select(it => it.MapToVerificationResponse());
+        
         return new PagedResult<VerificationResponse>
         {
             Items = verificationResponses,

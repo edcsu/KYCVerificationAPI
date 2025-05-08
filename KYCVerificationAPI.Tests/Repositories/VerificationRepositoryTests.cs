@@ -1,6 +1,9 @@
 using KYCVerificationAPI.Core;
+using KYCVerificationAPI.Data;
 using KYCVerificationAPI.Data.Entities;
 using KYCVerificationAPI.Data.Repositories;
+using KYCVerificationAPI.Features.Verifications.Requests;
+using Microsoft.EntityFrameworkCore;
 using Moq;
 
 namespace KYCVerificationAPI.Tests.Repositories
@@ -103,6 +106,34 @@ namespace KYCVerificationAPI.Tests.Repositories
 
             // Assert
             Assert.Null(result);
+        }
+        
+        [Fact]
+        public async Task GetHistoryAsync_WithValidFilter_ReturnsPagedResult()
+        {
+            // Arrange
+            var filter = new VerificationFilter 
+            { 
+                Page = 1,
+                PageSize = 10,
+                Nin = "123"
+            };
+            const string userEmail = "test@test.com";
+            var response = TestHelpers.GetPagedResponse(filter, userEmail);
+
+            _mockRepository.Setup(repo => repo.GetHistoryAsync(filter,
+                    userEmail,
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(response);
+    
+            // Act
+            var result = await _mockRepository.Object.GetHistoryAsync(filter, userEmail);
+    
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(20, result.TotalItems);
+            Assert.Equal(filter.Page, result.Page);
+            Assert.Equal(filter.PageSize, result.PageSize);
         }
     }
 }
