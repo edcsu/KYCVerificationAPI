@@ -46,10 +46,10 @@ This API mimics such a scenario, integrating:
     dotnet run
     ```
  
-2. Install dependencies
-    ```bash
-     dotnet restore
-    ```
+   2. Install dependencies
+       ```bash
+        dotnet restore
+       ```
  
 3. Update your settings in the `appsettings.Development.json` to be in this structure below and replace values to fit your setup.
     ```json lines
@@ -91,8 +91,13 @@ This API mimics such a scenario, integrating:
             "Key" : "SuperSecretToken2025ForYouAreGoingToProsper",
             "Issuer" : "https://auth.uverify.com",
             "Audience" : "https://kyc.uverify.com"
+        },
+        "RateLimit" : {
+          "PermitLimit" : 1,
+          "Window" : 5,
+          "QueueLimit" : 5
         }
-      }
+   }
     ``` 
    
 4. Run the application
@@ -286,7 +291,23 @@ The API uses standard HTTP status codes:
 
 ## 📈 Rate Limiting
 
-API requests are rate-limited outside the verification, auth, and documentation endpoints.
+API requests are rate-limited except auth, hangfire dashboard and documentation endpoints by initially.
+This is configurable in the app settings.
+```json5
+{
+   "RateLimit" : {
+      "PermitLimit" : 1, // Number of requests
+      "Window" : 5, // Per number of seconds
+      "QueueLimit" : 5, // Allowed requests in the queue
+      // paths exempted from rate limiting
+      "AllowedPaths" : [ 
+         "auth",
+         "scalar",
+         "hangfire"
+      ]
+   }
+}
+```
 
 ## 📋 Logging
 Logs are written to:

@@ -10,11 +10,4 @@ public static class ApiConstants
     public const string AdminUserClaim = "admin";
     public const string ClientUserClaim = "client";
     public const string TrustedUserPolicy = "Trusted";
-
-    public static readonly List<string> AllowedPaths =
-    [
-        "api",
-        "scalar",
-        "hangfire"
-    ];
 }
