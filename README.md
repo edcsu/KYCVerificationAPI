@@ -8,21 +8,20 @@ The project highlights my ability to solve real-world problems through [vertical
 
 - [Why This Feature](#-why-this-feature)
 - [Prerequisites](#-prerequisites)
-- [Getting Started](#️-getting-started)
+- [Getting Started](#-getting-started)
 - [API Endpoints](#api-endpoints)
    - [Verifications](#-verifications)
    - [Sample Requests](#-sample-requests)
-- [Disclaimer](#️-disclaimer)
+- [Disclaimer](#-disclaimer)
 - [Project Structure](#-project-structure)
-- [Running Tests](#️-running-tests)
+- [Running Tests](#-running-tests)
 - [Docker Support](#-docker-support)
 - [HTTP Status Codes](#-http-status-codes)
 - [Rate Limiting](#-rate-limiting)
 - [Logging](#-logging)
 - [Background Jobs with Hangfire](#-background-jobs-with-hangfire)
    - [Dashboard Access](#dashboard-access)
-   - [Job Types Supported](#job-types-supported)
-   - [Common Use Cases](#common-use-cases)
+   - [Security](#security)
 
 ## 🚀 Why This Feature
 
