@@ -1,30 +1,39 @@
 # KYC Verification API
 
-A simple yet functional KYC (Know Your Customer) verification REST API built using **.NET 9**. 
-This API simulates verifying a customer's details.
+A simple yet functional KYC (Know Your Customer) verification REST API that is built using **.NET 9**.
+It is designed to simulate the process of validating a user's identity against a national ID system. 
+The project highlights my ability to solve real-world problems through [vertical slice architecture](https://blog.ndepend.com/vertical-slice-architecture-in-asp-net-core/).
 
-## 🚀 Features
 
+## 🚀 Why This Feature
+
+In many financial and identity-sensitive applications, 
+verifying a user’s national ID is a critical step. 
+This API mimics such a scenario, integrating:
+
+- ✅ Clean separation of concerns with vertical slice architeture
+- ✅ Secured REST API using JWT tokens
 - ✅ Verify customer identity using a mock external service
-- 📡 RESTful API with Scalar UI documentation
+- 📡 RESTful API fully documented with [Scalar UI](https://guides.scalar.com/scalar/scalar-api-references/net-integration)
 - ✅ Unit tests using xUnit and Moq
-- ✅ Background jobs to handle long taks
+- ✅ Integration tests using xUnit and test containers
+- ✅ Background jobs to handle long-running tasks
+- ✅ Error handling and retry logic
+- ✅ Robust input validation
+- ✅ OpenTelemetry ready
 - 🐳 Optional Docker setup
 
-# KYC Verification API
 
-A RESTful API service for handling Know Your Customer (KYC) verification processes. Built with ASP.NET Core.
-
-## Prerequisites
+## 📌 Prerequisites
 
 - [.NET 9 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/9.0)
 - [Postgres Database](https://www.docker.com/blog/how-to-use-the-postgres-docker-official-image/)
-- An IDE (Visual Studio, Rider, or VS Code)
-  To quickly set it up locally:
-``` bash
-  docker run --name some-postgres \ 
-  -e POSTGRES_PASSWORD=mysecretpassword -d postgres
-```
+>  To quickly set it up locally:
+>``` bash
+>  docker run --name some-postgres \ 
+>  -e POSTGRES_PASSWORD=mysecretpassword -d postgres
+>```
+- An IDE ([Visual Studio](https://visualstudio.microsoft.com/downloads), [Rider](https://www.jetbrains.com/rider/download), or [VS Code](https://code.visualstudio.com/download))
 
 ## 🛠️ Getting Started
 
@@ -101,7 +110,7 @@ A RESTful API service for handling Know Your Customer (KYC) verification process
 
 A summary of the endpoints is shown below
 
-### Verifications
+### 🔎 Verifications
 
 | Method | Endpoint                  | Description | Auth Required  |
 |--------|---------------------------|-------------|----------------|
@@ -109,7 +118,7 @@ A summary of the endpoints is shown below
 | GET    | `/api/verifications/{id}` | Get verification by ID | Yes            |
 | POST   | `/api/auth/token`         | Delete verification | No             |
 
-### Sample Requests
+### 📝 Sample Requests
 
 #### Create Verification
 
@@ -144,7 +153,7 @@ For this showcase, the token is generated as shown below:
 
 1. Make a request to the token endpoint.
 There should be at least one custom claim for `client:true` to use
-the verification endpoints.
+the verification endpoints. This mimics how I setup clients to use the solution.
 
 `Token endpoint: https://localhost:7174/api/auth/token`
 The request body
@@ -171,10 +180,10 @@ The request body
     }'
  ```
 
-## 🔒 Disclaimer
+## ⚠️ Disclaimer
 This is a demo project.
-The mock external service and
-does not represent a real ID verification provider.
+The mock external service does not represent a real ID verification provider.
+It shows the interaction that can be there.
 
 ## 📁 Project Structure
 
@@ -203,6 +212,23 @@ KYCVerificationAPI/
 │ │ ├── AppDbContext 
 │ │ └── Context 
 │ ├── Features/ 
+│ │ ├── Auth/ 
+│ │ │  ├── Controllers/ 
+│ │ │  ├── Requests/ 
+│ │ │  ├── Responses/ 
+│ │ │  └── Validators/ 
+│ │ ├── Scheduler/ 
+│ │ │  └── Services/ 
+│ │ ├── Vendors/  
+│ │ │  ├── Requests/ 
+│ │ │  ├── Responses/ 
+│ │ │  └── Services/ 
+│ │ ├── Verifications/
+│ │ │  ├── Controllers/ 
+│ │ │  ├── Mappings/ 
+│ │ │  ├── Requests/ 
+│ │ │  ├── Services/ 
+│ │ │  └── Validators/  
 │ ├── Logs/ 
 │ └── Migrations/ 
 ├── KYCVerificationAPI.Tests/ 
@@ -210,15 +236,15 @@ KYCVerificationAPI/
 │ └── Repositories/ 
 │ │ └──VerificationRepositoryTests
 ├── KYCVerificationAPI.IntegrationTests
-│ │ Dependencies
-│ │ DatabaseFixture
-│ │ IntegrationHelpers
-│ │ VerificationRepositoryTests
+│ ├── Dependencies
+│ ├── DatabaseFixture
+│ ├── IntegrationHelpers
+│ └── VerificationRepositoryTests
 ├── Dockerfile 
 └── README.md
 ```
 
-## Running Tests
+## ⛓️‍💥 Running Tests
 
 - Execute the test suite using:
 ```bash 
@@ -230,22 +256,23 @@ dotnet test
 dotnet test ./tests/KYCVerificationAPI.Tests/KYCVerificationAPI.Tests.csproj
 ```
  
-## Docker Support
+## 🐳 Docker Support
 
-### Build the Docker image
+### 🪏 Build the Docker image
 
 ```bash 
 docker build -t kyc-verification-api .
 ```
-``` 
-### Run the container
+
+### 🏃🏿‍♂️‍➡️ Run the container
 
 ```bash 
 docker run -p 8080:80 \
 -e "ConnectionStrings__DefaultConnection=your-connection-string"\
 kyc-verification-api
 ```
-## HTTP status codes
+
+## 📶 HTTP status codes
 
 The API uses standard HTTP status codes:
 
@@ -257,11 +284,11 @@ The API uses standard HTTP status codes:
 - 404: Not Found
 - 500: Internal Server Error
 
-## Rate Limiting
+## 📈 Rate Limiting
 
 API requests are rate-limited outside the verification, auth, and documentation endpoints.
 
-## ## Logging
+## 📋 Logging
 Logs are written to:
 - Console
 - File system (`/logs` directory)
@@ -274,3 +301,5 @@ Logs are written to:
 >  --name aspire-dashboard \
 >  mcr.microsoft.com/dotnet/aspire-dashboard:9.1
 > ```
+> [.NET Aspire dashboard overview
+](https://learn.microsoft.com/en-us/dotnet/aspire/fundamentals/dashboard/overview?tabs=bash)
