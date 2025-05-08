@@ -14,7 +14,7 @@ public record KycResponse
     [Description("Match result of the names")]
     public bool? NameAsPerIdMatches { get; set; }
     
-    [Description("Match result of the nin")]
+    [Description("Match result of the NIN")]
     public bool? NinAsPerIdMatches { get; set; }
     
     [Description("Match result of the card number")]

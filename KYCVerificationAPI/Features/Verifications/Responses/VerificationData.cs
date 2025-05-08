@@ -16,11 +16,11 @@ public record VerificationData
 
     public DateOnly? DateOfBirth { get; set; } 
     
-    [Description("Nin of the holder on their National ID card")]
+    [Description("NIN of the holder on their National ID card")]
 
     public string Nin { get; init; } = string.Empty;
     
-    [Description("CardNumber of the holder on their National ID card")]
+    [Description("Card Number of the holder on their National ID card")]
     public string CardNumber { get; init; } = string.Empty;
     
     [Description("KYC status of the Verification")]

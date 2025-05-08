@@ -1,3 +1,4 @@
+using KYCVerificationAPI.Core;
 using KYCVerificationAPI.Features.Verifications.Requests;
 using KYCVerificationAPI.Features.Verifications.Responses;
 
@@ -9,5 +10,10 @@ public interface IVerificationService
         string email,
         CancellationToken cancellationToken = default);
     
-    Task<VerificationResponse?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
+    Task<VerificationResponse?> GetByIdAsync(Guid id, 
+        CancellationToken cancellationToken = default);
+    
+    Task<PagedResult<VerificationResponse>> GetHistoryAsync(VerificationFilter verificationFilter,
+        string userEmail,
+        CancellationToken cancellationToken = default);
 }
