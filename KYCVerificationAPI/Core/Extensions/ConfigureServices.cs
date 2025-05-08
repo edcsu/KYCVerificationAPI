@@ -147,10 +147,7 @@ public static class ConfigureServices
         
         var limitOptions = new RateLimitConfig();
         builder.Configuration.GetSection(RateLimitConfig.SectionName).Bind(limitOptions);
-        foreach (var path in limitOptions.AllowedPaths)
-        {
-            Log.Information(path);
-        }
+        
         builder.Services.AddRateLimiter(options =>
         {
             options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
@@ -164,7 +161,7 @@ public static class ConfigureServices
                     Log.Information("Rate limiting applied");
                     return RateLimitPartition.GetFixedWindowLimiter(
                         ipAddress,
-                        partition => new FixedWindowRateLimiterOptions
+                        _ => new FixedWindowRateLimiterOptions
                         {
                             PermitLimit = limitOptions.PermitLimit,             
                             Window = TimeSpan.FromSeconds(limitOptions.Window), 
@@ -200,9 +197,9 @@ public static class ConfigureServices
                 ValidateLifetime = true,
                 ValidateIssuer = true,
                 ValidateAudience = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfig.Key!)),
-                ValidIssuer = jwtConfig.Issuer!,
-                ValidAudience = jwtConfig.Audience!,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfig.Key)),
+                ValidIssuer = jwtConfig.Issuer,
+                ValidAudience = jwtConfig.Audience,
             };
         });
     }
