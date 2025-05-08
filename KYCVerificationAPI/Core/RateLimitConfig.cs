@@ -8,5 +8,7 @@ public class RateLimitConfig
 
     public int Window { get; set; } = 5;
         
-    public int QueueLimit { get; set; } = 15;
+    public int QueueLimit { get; set; } = 2;
+
+    public List<string> AllowedPaths { get; set; } = [];
 }

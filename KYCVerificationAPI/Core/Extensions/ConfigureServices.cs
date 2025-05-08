@@ -145,7 +145,10 @@ public static class ConfigureServices
         
         var limitOptions = new RateLimitConfig();
         builder.Configuration.GetSection(RateLimitConfig.SectionName).Bind(limitOptions);
-        
+        foreach (var path in limitOptions.AllowedPaths)
+        {
+            Log.Information(path);
+        }
         builder.Services.AddRateLimiter(options =>
         {
             options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
@@ -154,16 +157,16 @@ public static class ConfigureServices
                 var ipAddress = context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
                 Log.Information("This request is coming from: {IpAddress}", ipAddress);
                 
-                if (!ApiConstants.AllowedPaths.Any(allowedPath => path.Contains(allowedPath, StringComparison.OrdinalIgnoreCase)))
+                if (!limitOptions.AllowedPaths.Any(allowedPath => path.Contains(allowedPath, StringComparison.OrdinalIgnoreCase)))
                 {
                     Log.Information("Rate limiting applied");
                     return RateLimitPartition.GetFixedWindowLimiter(
                         ipAddress,
                         partition => new FixedWindowRateLimiterOptions
                         {
-                            PermitLimit = limitOptions.PermitLimit,             // 1 requests
-                            Window = TimeSpan.FromSeconds(limitOptions.Window), // Per 5 seconds
-                            QueueLimit = limitOptions.QueueLimit,              // Allow 15 requests in the queue
+                            PermitLimit = limitOptions.PermitLimit,             
+                            Window = TimeSpan.FromSeconds(limitOptions.Window), 
+                            QueueLimit = limitOptions.QueueLimit,              
                             QueueProcessingOrder = QueueProcessingOrder.OldestFirst
                         });
                 }
