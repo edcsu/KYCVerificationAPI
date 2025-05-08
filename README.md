@@ -125,25 +125,7 @@ A summary of the endpoints is shown below
 
 ### 📝 Sample Requests
 
-#### Create Verification
-
->http POST /api/verifications Content-Type: application/json
->Authorization: Bearer {your-token}
-
-```json lines
-{
-  "firstName": "Kalele",
-  "givenName": "Justice",
-  "dateOfBirth": "1974-02-12",
-  "nin": "12345678901234",
-  "cardNumber": "123456789"
-}
-```
-
-#### Get Verification
-
-> http GET /api/verifications/{id} Authorization: Bearer {your-token}
-
+> you need an access token first to access the verification endpoints
 
 #### 🔒 Get Access token
 
@@ -160,7 +142,8 @@ For this showcase, the token is generated as shown below:
 There should be at least one custom claim for `client:true` to use
 the verification endpoints. This mimics how I set up clients to use the solution.
 
-`Token endpoint: https://localhost:7174/api/auth/token`
+`Token endpoints: https://localhost:7174/api/auth/token or https://localhost:5160/api/auth/token`
+
 The request body
 ```json lines
 {
@@ -182,8 +165,27 @@ The request body
       "customClaims": {
         "client": true
       }
-    }'
- ```
+   }'
+```
+#### Create Verification
+
+>http POST /api/verifications Content-Type: application/json
+>Authorization: Bearer {your-token}
+
+```json lines
+{
+  "firstName": "Kalele",
+  "givenName": "Justice",
+  "dateOfBirth": "1974-02-12",
+  "nin": "12345678901234",
+  "cardNumber": "123456789"
+}
+```
+
+#### Get Verification
+
+> http GET /api/verifications/{id} Authorization: Bearer {your-token}
+
 
 ## ⚠️ Disclaimer
 This is a demo project.
@@ -333,3 +335,31 @@ Logs are written to:
 > ```
 > [.NET Aspire dashboard overview
 ](https://learn.microsoft.com/en-us/dotnet/aspire/fundamentals/dashboard/overview?tabs=bash)
+
+## 🔄 Background Jobs with Hangfire
+
+The API uses Hangfire for managing and executing background jobs.
+In particular the calls made to the mocked external Id system.
+This helps handle long-running tasks asynchronously, 
+improving the API's responsiveness.
+
+### Dashboard Access
+
+The Hangfire dashboard is available at `/hangfire`.
+To access the dashboard, navigate to:
+> [https link](https://localhost:7174/hangfire) or 
+> [http link](http://localhost:5160/hangfire)
+
+It provides a real-time view of:
+- Scheduled jobs
+- Failed jobs
+- Recurring jobs
+- Job history
+- Real-time job metrics
+
+### Security
+
+The Hangfire dashboard is open for this showcase. 
+> In production, it should be both secured and require authentication.
+> Only users with administrative access should view and manage jobs.
+
