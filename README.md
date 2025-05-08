@@ -1,4 +1,4 @@
-# KYC Verification API
+# 🔏 KYC Verification API
 
 A simple yet functional KYC (Know Your Customer) verification REST API that is built using **.NET 9**.
 It is designed to simulate the process of validating a user's identity against a national ID system. 
@@ -11,7 +11,7 @@ In many financial and identity-sensitive applications,
 verifying a user’s national ID is a critical step. 
 This API mimics such a scenario, integrating:
 
-- ✅ Clean separation of concerns with vertical slice architeture
+- ✅ Clean separation of concerns with vertical slice architecture
 - ✅ Secured REST API using JWT tokens
 - ✅ Verify customer identity using a mock external service
 - 📡 RESTful API fully documented with [Scalar UI](https://guides.scalar.com/scalar/scalar-api-references/net-integration)
@@ -46,10 +46,10 @@ This API mimics such a scenario, integrating:
     dotnet run
     ```
  
-   2. Install dependencies
-       ```bash
-        dotnet restore
-       ```
+2. Install dependencies
+    ```bash
+     dotnet restore
+    ```
  
 3. Update your settings in the `appsettings.Development.json` to be in this structure below and replace values to fit your setup.
     ```json lines
@@ -110,18 +110,18 @@ This API mimics such a scenario, integrating:
 
 ## API Endpoints
 
-> The API [https documentation can be accessed her](https://localhost:7174) while
+> The API [https documentation can be accessed here](https://localhost:7174) while
 > the [http documentation is here](http://localhost:5160)
 
 A summary of the endpoints is shown below
 
 ### 🔎 Verifications
 
-| Method | Endpoint                  | Description | Auth Required  |
-|--------|---------------------------|-------------|----------------|
+| Method | Endpoint                  | Description             | Auth Required  |
+|--------|---------------------------|-------------------------|----------------|
 | POST   | `/api/verifications`      | Create new verification | Yes            |
-| GET    | `/api/verifications/{id}` | Get verification by ID | Yes            |
-| POST   | `/api/auth/token`         | Delete verification | No             |
+| GET    | `/api/verifications/{id}` | Get verification by ID  | Yes            |
+| POST   | `/api/auth/token`         | Delete verification     | No             |
 
 ### 📝 Sample Requests
 
@@ -158,7 +158,7 @@ For this showcase, the token is generated as shown below:
 
 1. Make a request to the token endpoint.
 There should be at least one custom claim for `client:true` to use
-the verification endpoints. This mimics how I setup clients to use the solution.
+the verification endpoints. This mimics how I set up clients to use the solution.
 
 `Token endpoint: https://localhost:7174/api/auth/token`
 The request body
@@ -314,13 +314,22 @@ Logs are written to:
 - Console
 - File system (`/logs` directory)
 - OpenTelemetry (if configured)
-> to spin up quickly one
+> To spin up an open telemetry injester quickly.
 > ```bash
 > docker run --rm -it -d \
 >  -p 18888:18888 \
 >  -p 4317:18889 \
 >  --name aspire-dashboard \
 >  mcr.microsoft.com/dotnet/aspire-dashboard:9.1
+> ```
+> then update the appsettings file accordingly
+> ```json5
+> {
+>   "OtelConfing": {
+>     "Endpoint": "http://localhost:4317", // default aspire url
+>     "Enabled": false
+>   }
+> }
 > ```
 > [.NET Aspire dashboard overview
 ](https://learn.microsoft.com/en-us/dotnet/aspire/fundamentals/dashboard/overview?tabs=bash)
