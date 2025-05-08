@@ -4,6 +4,25 @@ A simple yet functional KYC (Know Your Customer) verification REST API that is b
 It is designed to simulate the process of validating a user's identity against a national ID system. 
 The project highlights my ability to solve real-world problems through [vertical slice architecture](https://blog.ndepend.com/vertical-slice-architecture-in-asp-net-core/).
 
+## 📑 Table of Contents
+
+- [Why This Feature](#-why-this-feature)
+- [Prerequisites](#-prerequisites)
+- [Getting Started](#️-getting-started)
+- [API Endpoints](#api-endpoints)
+   - [Verifications](#-verifications)
+   - [Sample Requests](#-sample-requests)
+- [Disclaimer](#️-disclaimer)
+- [Project Structure](#-project-structure)
+- [Running Tests](#️-running-tests)
+- [Docker Support](#-docker-support)
+- [HTTP Status Codes](#-http-status-codes)
+- [Rate Limiting](#-rate-limiting)
+- [Logging](#-logging)
+- [Background Jobs with Hangfire](#-background-jobs-with-hangfire)
+   - [Dashboard Access](#dashboard-access)
+   - [Job Types Supported](#job-types-supported)
+   - [Common Use Cases](#common-use-cases)
 
 ## 🚀 Why This Feature
 
@@ -101,9 +120,9 @@ This API mimics such a scenario, integrating:
     ``` 
    
 4. Run the application
-    ```bash 
-      dotnet run
-    ````
+ ```bash 
+   dotnet run
+ ```
 > The API will be available at `https://localhost:7174` 
 > or `http://localhost:5160`
 > By default, it opens in the API documentation link.
