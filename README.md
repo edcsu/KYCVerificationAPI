@@ -166,7 +166,7 @@ The request body
 ```json lines
 {
   "userId": "2032f3c8-ecc3-4205-94d1-5b05d2ea7c65",
-  "email": "m@example",
+  "email": "test@example.com",
   "customClaims": {
     "client": true
   }
@@ -179,7 +179,7 @@ The request body
    --header 'Content-Type: application/json' \
    --data '{
       "userId": "2032f3c8-ecc3-4205-94d1-5b05d2ea7c65",
-      "email": "m@example",
+      "email": "test@example.com",
       "customClaims": {
         "client": true
       }

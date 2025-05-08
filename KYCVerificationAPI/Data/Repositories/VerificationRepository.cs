@@ -53,19 +53,19 @@ public class VerificationRepository : IVerificationRepository
     {
         var query = _context.Verifications.AsQueryable();
         
-            query = query.Where(v => v.CreatedBy == userEmail);
+        query = query.Where(v => v.CreatedBy == userEmail);
 
         if (!string.IsNullOrWhiteSpace(verificationFilter.Nin))
             query = query.Where(v => v.Nin.Contains(verificationFilter.Nin));
         
         if (!string.IsNullOrWhiteSpace(verificationFilter.CardNumber))
-            query = query.Where(v => v.Nin.Contains(verificationFilter.CardNumber));
+            query = query.Where(v => v.CardNumber.Contains(verificationFilter.CardNumber));
         
         if (!string.IsNullOrWhiteSpace(verificationFilter.FirstName))
-            query = query.Where(v => v.Nin.Contains(verificationFilter.FirstName));
+            query = query.Where(v => v.FirstName.Contains(verificationFilter.FirstName));
         
         if (!string.IsNullOrWhiteSpace(verificationFilter.GivenName))
-            query = query.Where(v => v.Nin.Contains(verificationFilter.GivenName));
+            query = query.Where(v => v.GivenName.Contains(verificationFilter.GivenName));
         
         if (verificationFilter.NameAsPerIdMatches.HasValue)
             query = query.Where(v => v.NameAsPerIdMatches == verificationFilter.NameAsPerIdMatches);
