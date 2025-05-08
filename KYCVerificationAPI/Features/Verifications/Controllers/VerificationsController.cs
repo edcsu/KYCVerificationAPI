@@ -128,4 +128,42 @@ public class VerificationsController : ControllerBase
             return Ok(response);
         }
     }
+    
+    [Authorize(ApiConstants.TrustedUserPolicy)]
+    [HttpGet(Name = "GetHistory")]
+    [ProducesResponseType(typeof(PagedResult<VerificationResponse>), 
+        StatusCodes.Status200OK,
+        MediaTypeNames.Application.Json)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [EndpointSummary("Returns verification history")]
+    [EndpointDescription("Returns details of verifications made by the user")]
+    [Stability(Stability.Stable)]
+    public async Task<IActionResult> GetAsync([FromBody] VerificationFilter verificationFilter,
+        CancellationToken token = default)
+    {
+        var emailClaim = HttpContext.User.Claims.FirstOrDefault(it => it.Type == ClaimTypes.Email);
+        if (emailClaim is null)
+        {
+            _logger.LogError("Invalid email claim");
+            return Forbid();
+        }
+        var email = emailClaim.Value;
+        
+        var correlationId = _correlationIdGenerator.Get();
+        ILogEventEnricher[] enrichers =
+        [
+            new PropertyEnricher("CorrelationId", correlationId)
+        ];
+
+        using (LogContext.Push(enrichers))
+        {
+            _logger.LogInformation("Getting verifications");
+            var response = await _verificationService.GetHistoryAsync(verificationFilter, email, token);
+
+            _logger.LogInformation("Finished getting verifications");
+            return Ok(response);
+        }
+    }
 }
