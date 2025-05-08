@@ -1,4 +1,6 @@
 using KYCVerificationAPI.Data.Repositories;
+using KYCVerificationAPI.Features.Verifications.Requests;
+using Moq;
 
 namespace KYCVerificationAPI.IntegrationTests;
 
@@ -83,5 +85,28 @@ public class VerificationRepositoryTests : IClassFixture<DatabaseFixture>
 
         // Assert
         Assert.Null(result);
+    }
+    
+    [Fact]
+    public async Task GetHistoryAsync_WithValidFilter_ReturnsPagedResult()
+    {
+        // Arrange
+        var filter = new VerificationFilter 
+        { 
+            Page = 1,
+            PageSize = 10
+        };
+        const string userEmail = "test@test.com";
+        var newVerification = IntegrationHelpers.GetVerification(userEmail);
+        await _verificationRepository.AddAsync(newVerification);
+
+        // Act
+        var result = await _verificationRepository.GetHistoryAsync(filter, userEmail);
+    
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(1, result.TotalItems);
+        Assert.Equal(filter.Page, result.Page);
+        Assert.Equal(filter.PageSize, result.PageSize);
     }
 }

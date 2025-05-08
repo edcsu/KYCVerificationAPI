@@ -48,7 +48,7 @@ public static class TestHelpers
         int max = 20)
     {
         var requestFaker = new Faker<Verification>()
-            .RuleFor(r => r.CreatedBy, f => f.Person.Email)
+            .RuleFor(r => r.CreatedBy, f => userEmail)
             .RuleFor(r => r.FirstName, f => f.Name.FirstName())
             .RuleFor(r => r.GivenName, f => f.Name.LastName())
             .RuleFor(r => r.Id, f => f.Random.Guid())
@@ -66,13 +66,17 @@ public static class TestHelpers
             .RuleFor(r => r.CreatedAt, f => f.Date.Past().ToUniversalTime())
             .RuleFor(r => r.LastUpdated, f => f.Date.Past().ToUniversalTime());
         var requests = requestFaker.Generate(max);
+        var totalPages = (int)Math.Ceiling(requests.Count / (double)filter.PageSize);
+        
         var verificationResponses = requests.Select(it => it.MapToVerificationResponse());
         return new PagedResult<VerificationResponse>
         {
             Data = verificationResponses,
             TotalItems = requests.Count,
             Page = filter.Page,
-            PageSize = filter.PageSize
+            PageSize = filter.PageSize,
+            HasNextPage = filter.Page < totalPages,
+            HasPreviousPage = filter.Page > 1,
         };
     }
 }
