@@ -10,12 +10,12 @@ public class CreateVerificationValidator:AbstractValidator<CreateVerification>
         RuleFor(x => x.FirstName)
             .NotEmpty()
             .MinimumLength(2)
-            .MaximumLength(25);
+            .MaximumLength(100);
      
         RuleFor(x => x.GivenName)
             .NotEmpty()
             .MinimumLength(2)
-            .MaximumLength(25);
+            .MaximumLength(100);
         
         RuleFor(x => x.DateOfBirth)
             .NotEmpty();

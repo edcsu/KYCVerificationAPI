@@ -1,6 +1,9 @@
 using KYCVerificationAPI.Core;
+using KYCVerificationAPI.Data;
 using KYCVerificationAPI.Data.Entities;
 using KYCVerificationAPI.Data.Repositories;
+using KYCVerificationAPI.Features.Verifications.Requests;
+using Microsoft.EntityFrameworkCore;
 using Moq;
 
 namespace KYCVerificationAPI.Tests.Repositories
@@ -39,11 +42,11 @@ namespace KYCVerificationAPI.Tests.Repositories
             // Arrange
             var verifications = TestHelpers.GetVerifications();
 
-            _mockRepository.Setup(repo => repo.GetAll(It.IsAny<CancellationToken>()))
+            _mockRepository.Setup(repo => repo.GetAllAsync(It.IsAny<CancellationToken>()))
                 .ReturnsAsync(verifications);
 
             // Act
-            var result = await _mockRepository.Object.GetAll(It.IsAny<CancellationToken>());
+            var result = await _mockRepository.Object.GetAllAsync(It.IsAny<CancellationToken>());
 
             // Assert
             Assert.NotNull(result);
@@ -56,12 +59,12 @@ namespace KYCVerificationAPI.Tests.Repositories
             // Arrange
             var newVerification = TestHelpers.GetVerifications(1).First();
 
-            _mockRepository.Setup(repo => repo.Add(newVerification, 
+            _mockRepository.Setup(repo => repo.AddAsync(newVerification, 
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(newVerification);
 
             // Act
-            var result = await _mockRepository.Object.Add(newVerification, 
+            var result = await _mockRepository.Object.AddAsync(newVerification, 
                 It.IsAny<CancellationToken>());
 
             // Assert
@@ -76,12 +79,12 @@ namespace KYCVerificationAPI.Tests.Repositories
             var verification = TestHelpers.GetVerifications(1).First();
             verification.Status = VerificationStatus.Failed;
             
-            _mockRepository.Setup(repo => repo.Update(verification, 
+            _mockRepository.Setup(repo => repo.UpdateAsync(verification, 
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(verification);
 
             // Act
-            var result = await _mockRepository.Object.Update(verification);
+            var result = await _mockRepository.Object.UpdateAsync(verification);
 
             // Assert
             Assert.NotNull(result);
@@ -103,6 +106,34 @@ namespace KYCVerificationAPI.Tests.Repositories
 
             // Assert
             Assert.Null(result);
+        }
+        
+        [Fact]
+        public async Task GetHistoryAsync_WithValidFilter_ReturnsPagedResult()
+        {
+            // Arrange
+            var filter = new VerificationFilter 
+            { 
+                Page = 1,
+                PageSize = 10,
+                Nin = "123"
+            };
+            const string userEmail = "test@test.com";
+            var response = TestHelpers.GetPagedResponse(filter, userEmail);
+
+            _mockRepository.Setup(repo => repo.GetHistoryAsync(filter,
+                    userEmail,
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(response);
+    
+            // Act
+            var result = await _mockRepository.Object.GetHistoryAsync(filter, userEmail);
+    
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(20, result.TotalItems);
+            Assert.Equal(filter.Page, result.Page);
+            Assert.Equal(filter.PageSize, result.PageSize);
         }
     }
 }

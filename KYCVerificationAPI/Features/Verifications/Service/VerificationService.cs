@@ -1,4 +1,5 @@
 using Hangfire;
+using KYCVerificationAPI.Core;
 using KYCVerificationAPI.Data.Repositories;
 using KYCVerificationAPI.Features.Scheduler.Services;
 using KYCVerificationAPI.Features.Verifications.Mappings;
@@ -21,7 +22,7 @@ public class VerificationService(IVerificationRepository verificationRepository,
         verification.CorrelationId = correlationId;
         verification.CreatedBy = email;
         
-        var savedVerification = await verificationRepository.Add(verification, cancellationToken);
+        var savedVerification = await verificationRepository.AddAsync(verification, cancellationToken);
         var verificationResponse = savedVerification.MapToVerificationResponse();
         logger.LogInformation("Saved verification");
 
@@ -35,5 +36,13 @@ public class VerificationService(IVerificationRepository verificationRepository,
     {
         var verification = await verificationRepository.GetByIdAsync(id, cancellationToken);
         return verification?.MapToVerificationResponse();
+    }
+
+    public async Task<PagedResult<VerificationResponse>> GetHistoryAsync(VerificationFilter verificationFilter, 
+        string userEmail,
+        CancellationToken cancellationToken = default)
+    {
+        var response = await verificationRepository.GetHistoryAsync(verificationFilter, userEmail, cancellationToken);
+        return response;
     }
 }

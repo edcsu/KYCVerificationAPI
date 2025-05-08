@@ -26,17 +26,19 @@ public class VerificationsController : ControllerBase
     private readonly IVerificationService _verificationService;
     private readonly ILogger<VerificationsController> _logger;
     private readonly IValidator<CreateVerification> _createValidator;
+    private readonly IValidator<VerificationFilter> _verificationFilterValidator;
     private readonly ICorrelationIdGenerator _correlationIdGenerator;
     
     public VerificationsController(IVerificationService verificationService, 
         ILogger<VerificationsController> logger, 
         IValidator<CreateVerification> createValidator, 
-        ICorrelationIdGenerator correlationIdGenerator)
+        ICorrelationIdGenerator correlationIdGenerator, IValidator<VerificationFilter> verificationFilterValidator)
     {
         _verificationService = verificationService;
         _logger = logger;
         _createValidator = createValidator;
         _correlationIdGenerator = correlationIdGenerator;
+        _verificationFilterValidator = verificationFilterValidator;
     }
 
     [Authorize(ApiConstants.TrustedUserPolicy)]
@@ -125,6 +127,51 @@ public class VerificationsController : ControllerBase
             }
 
             _logger.LogInformation("Finished getting verification");
+            return Ok(response);
+        }
+    }
+    
+    [Authorize(ApiConstants.TrustedUserPolicy)]
+    [HttpGet(Name = "GetHistory")]
+    [ProducesResponseType(typeof(PagedResult<VerificationResponse>), 
+        StatusCodes.Status200OK,
+        MediaTypeNames.Application.Json)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [EndpointSummary("Returns verification history")]
+    [EndpointDescription("Returns details of verifications made by the user")]
+    [Stability(Stability.Stable)]
+    public async Task<IActionResult> GetAsync([FromQuery] VerificationFilter verificationFilter,
+        CancellationToken token = default)
+    {
+        var emailClaim = HttpContext.User.Claims.FirstOrDefault(it => it.Type == ClaimTypes.Email);
+        if (emailClaim is null)
+        {
+            _logger.LogError("Invalid email claim");
+            return Forbid();
+        }
+        var email = emailClaim.Value;
+        
+        var correlationId = _correlationIdGenerator.Get();
+        ILogEventEnricher[] enrichers =
+        [
+            new PropertyEnricher("CorrelationId", correlationId)
+        ];
+        
+        var validationResult = await _verificationFilterValidator.ValidateAsync(verificationFilter, token);
+        if (!validationResult.IsValid)
+        {
+            _logger.LogInformation("Invalid verification history request");
+            return BadRequest(validationResult.ToDictionary());
+        }
+
+        using (LogContext.Push(enrichers))
+        {
+            _logger.LogInformation("Getting verifications");
+            var response = await _verificationService.GetHistoryAsync(verificationFilter, email, token);
+
+            _logger.LogInformation("Finished getting verifications");
             return Ok(response);
         }
     }

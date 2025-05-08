@@ -70,7 +70,7 @@ public class SchedulerService : ISchedulerService
             request.NameAsPerIdMatches = kycResponse.NameAsPerIdMatches;
             request.NinAsPerIdMatches = kycResponse.NinAsPerIdMatches;
             request.KycMessage = kycResponse.Message;
-            var verificationRequest = await _verificationRepository.Update(request, cancellationToken);
+            var verificationRequest = await _verificationRepository.UpdateAsync(request, cancellationToken);
             _logger.LogInformation("Finalised verification");
 
             return true;
@@ -88,14 +88,14 @@ public class SchedulerService : ISchedulerService
         {
             request.Status = VerificationStatus.Failed;
             request.KycStatus = KycStatus.Error;
-            var verificationRequest = await _verificationRepository.Update(request, cancellationToken);
+            var verificationRequest = await _verificationRepository.UpdateAsync(request, cancellationToken);
             _logger.LogError("The verification request with ID {RequestId} has failed after {MaxRetries} retries", 
                 request.Id, ApiConstants.MaxRetryAttempts);
         }
         else
         {
             request.Retries++;
-            var verificationRequest = await _verificationRepository.Update(request, cancellationToken);
+            var verificationRequest = await _verificationRepository.UpdateAsync(request, cancellationToken);
             _logger.LogError("KYC verification failed. Scheduling retry {CurrentRetry} out of {MaxRetries} for request {RequestId}", 
                 verificationRequest.Retries, ApiConstants.MaxRetryAttempts, request.Id);
         }
