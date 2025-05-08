@@ -9,7 +9,7 @@ public class VerificationFilter
     public bool? IsMatch { get; set; }
     public string? Nin { get; set; }
 
-    public int? Page { get; set; } = 1;
+    public int Page { get; set; } = 1;
 
     public int PageSize
     {
