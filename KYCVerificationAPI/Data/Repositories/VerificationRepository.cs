@@ -52,9 +52,32 @@ public class VerificationRepository : IVerificationRepository
         CancellationToken cancellationToken = default)
     {
         var query = _context.Verifications.AsQueryable();
+        
+            query = query.Where(v => v.CreatedBy == userEmail);
 
         if (!string.IsNullOrWhiteSpace(verificationFilter.Nin))
             query = query.Where(v => v.Nin.Contains(verificationFilter.Nin));
+        
+        if (!string.IsNullOrWhiteSpace(verificationFilter.CardNumber))
+            query = query.Where(v => v.Nin.Contains(verificationFilter.CardNumber));
+        
+        if (!string.IsNullOrWhiteSpace(verificationFilter.FirstName))
+            query = query.Where(v => v.Nin.Contains(verificationFilter.FirstName));
+        
+        if (!string.IsNullOrWhiteSpace(verificationFilter.GivenName))
+            query = query.Where(v => v.Nin.Contains(verificationFilter.GivenName));
+        
+        if (verificationFilter.NameAsPerIdMatches.HasValue)
+            query = query.Where(v => v.NameAsPerIdMatches == verificationFilter.NameAsPerIdMatches);
+        
+        if (verificationFilter.NinAsPerIdMatches.HasValue)
+            query = query.Where(v => v.NinAsPerIdMatches == verificationFilter.NinAsPerIdMatches);
+        
+        if (verificationFilter.CardNumberAsPerIdMatches.HasValue)
+            query = query.Where(v => v.CardNumberAsPerIdMatches == verificationFilter.CardNumberAsPerIdMatches);
+        
+        if (verificationFilter.DateOfBirthMatches.HasValue)
+            query = query.Where(v => v.NameAsPerIdMatches == verificationFilter.DateOfBirthMatches);
 
         var total = await query.CountAsync(cancellationToken);
 

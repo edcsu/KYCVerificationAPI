@@ -140,7 +140,7 @@ public class VerificationsController : ControllerBase
     [EndpointSummary("Returns verification history")]
     [EndpointDescription("Returns details of verifications made by the user")]
     [Stability(Stability.Stable)]
-    public async Task<IActionResult> GetAsync([FromBody] VerificationFilter verificationFilter,
+    public async Task<IActionResult> GetAsync([FromQuery] VerificationFilter verificationFilter,
         CancellationToken token = default)
     {
         var emailClaim = HttpContext.User.Claims.FirstOrDefault(it => it.Type == ClaimTypes.Email);
