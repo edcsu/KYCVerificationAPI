@@ -102,6 +102,7 @@ public class VerificationRepository : IVerificationRepository
         }
 
         var total = await query.CountAsync(cancellationToken);
+        var totalPages = (int)Math.Ceiling(total / (double)verificationFilter.PageSize);
 
         var verificationResponses = await query
             .OrderByDescending(v => v.CreatedAt)
@@ -111,10 +112,12 @@ public class VerificationRepository : IVerificationRepository
         
         return new PagedResult<VerificationResponse>
         {
-            Items = verificationResponses,
+            Data = verificationResponses,
             TotalItems = total,
             Page = verificationFilter.Page,
-            PageSize = verificationFilter.PageSize
+            PageSize = verificationFilter.PageSize,
+            HasNextPage = verificationFilter.Page < totalPages,
+            HasPreviousPage = verificationFilter.Page > 1,
         };
     }
 }

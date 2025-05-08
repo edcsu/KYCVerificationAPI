@@ -49,8 +49,10 @@ public class VerificationFilter
     [Description("The end date of the date range")]
     public DateOnly? To { get; init; }
     
+    [Description("The page to view")]
     public int Page { get; init; } = 1;
 
+    [Description("The number of items per page")]
     public int PageSize
     {
         get => _pageSize;

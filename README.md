@@ -135,11 +135,12 @@ A summary of the endpoints is shown below
 
 ### 🔎 Verifications
 
-| Method | Endpoint                  | Description             | Auth Required  |
-|--------|---------------------------|-------------------------|----------------|
-| POST   | `/api/verifications`      | Create new verification | Yes            |
-| GET    | `/api/verifications/{id}` | Get verification by ID  | Yes            |
-| POST   | `/api/auth/token`         | Delete verification     | No             |
+| Method | Endpoint                  | Description                                         | Auth Required  |
+|--------|---------------------------|-----------------------------------------------------|----------------|
+| POST   | `/api/verifications`      | Create new verification                             | Yes            |
+| GET    | `/api/verifications/{id}` | Get verification by ID                              | Yes            |
+| GET    | `/api/verifications`      | Returns the list of the verifications that you made | Yes            |
+| POST   | `/api/auth/token`         | Delete verification                                 | No             |
 
 ### 📝 Sample Requests
 
@@ -203,6 +204,31 @@ The request body
 #### Get Verification
 
 > http GET /api/verifications/{id} Authorization: Bearer {your-token}
+
+#### Get Verification history
+> http GET /api/verifications Authorization: Bearer {your-token}
+
+##### query parameters
+
+| Parameter                | Type         | Description                                           |
+|--------------------------|--------------|-------------------------------------------------------|
+| TransactionId            | `Guid`       | Unique identifier of the verification                 |
+| Status                   | `string`     | Status of the Verification                            |
+| KycStatus                | `bool`       | KYC Status of the Verification                        |
+| NameAsPerIdMatches       | `bool`       | Match result of the names                             |
+| NinAsPerIdMatches        | `bool`       | Match result of the NIN                               |
+| CardNumberAsPerIdMatches | `bool`       | Match result of the card number                       |
+| DateOfBirthMatches       | `bool`       | Match result of the date of birth                     |
+| DateOfBirth              | `DateOnly`   | Date of birth of the holder on their National ID card |
+| FirstName                | `string`     | First name of the holder on their National ID card    |
+| GivenName                | `string`     | Given name of the holder on their National ID card    |
+| CardNumber               | `string`     | Card number of the holder on their National ID card   |
+| Nin                      | `string`     | NIN of the holder on their National ID card           |
+| Page                     | `int`        | The page to view                                      |
+| PageSize                 | `int`        | The number of items per page                          |
+| From                     | `DateOnly`   | The start date of the date range                      |
+| To                       | `DateOnly`   | The end date of the date range                        |
+
 
 
 ## ⚠️ Disclaimer

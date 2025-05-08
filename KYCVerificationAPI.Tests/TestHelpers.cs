@@ -69,7 +69,7 @@ public static class TestHelpers
         var verificationResponses = requests.Select(it => it.MapToVerificationResponse());
         return new PagedResult<VerificationResponse>
         {
-            Items = verificationResponses,
+            Data = verificationResponses,
             TotalItems = requests.Count,
             Page = filter.Page,
             PageSize = filter.PageSize
