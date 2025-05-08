@@ -21,7 +21,7 @@ public class VerificationService(IVerificationRepository verificationRepository,
         verification.CorrelationId = correlationId;
         verification.CreatedBy = email;
         
-        var savedVerification = await verificationRepository.Add(verification, cancellationToken);
+        var savedVerification = await verificationRepository.AddAsync(verification, cancellationToken);
         var verificationResponse = savedVerification.MapToVerificationResponse();
         logger.LogInformation("Saved verification");
 

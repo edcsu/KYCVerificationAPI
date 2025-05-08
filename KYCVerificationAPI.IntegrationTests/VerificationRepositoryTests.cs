@@ -18,7 +18,7 @@ public class VerificationRepositoryTests : IClassFixture<DatabaseFixture>
         var newVerification = IntegrationHelpers.GetVerification();
         
         // Act
-        var result = await _verificationRepository.Add(newVerification);
+        var result = await _verificationRepository.AddAsync(newVerification);
 
         // Assert
         Assert.NotNull(result);
@@ -30,12 +30,12 @@ public class VerificationRepositoryTests : IClassFixture<DatabaseFixture>
     {
         // Arrange
         var newVerification = IntegrationHelpers.GetVerification();
-        var savedVerification = await _verificationRepository.Add(newVerification);
+        var savedVerification = await _verificationRepository.AddAsync(newVerification);
 
         const string newMessage = "The KYC is valid";
         savedVerification.KycMessage = newMessage;
         // Act
-        var result = await _verificationRepository.Update(savedVerification);
+        var result = await _verificationRepository.UpdateAsync(savedVerification);
 
         // Assert
         Assert.NotNull(result);
@@ -47,7 +47,7 @@ public class VerificationRepositoryTests : IClassFixture<DatabaseFixture>
     {
         // Arrange
         var expectedVerification = IntegrationHelpers.GetVerification();
-        await _verificationRepository.Add(expectedVerification);
+        await _verificationRepository.AddAsync(expectedVerification);
 
         // Act
         var result = await _verificationRepository.GetByIdAsync(expectedVerification.Id, CancellationToken.None);
@@ -62,10 +62,10 @@ public class VerificationRepositoryTests : IClassFixture<DatabaseFixture>
     {
         // Arrange
         var newVerification = IntegrationHelpers.GetVerification();
-        await _verificationRepository.Add(newVerification);
+        await _verificationRepository.AddAsync(newVerification);
 
         // Act
-        var result = await _verificationRepository.GetAll(CancellationToken.None);
+        var result = await _verificationRepository.GetAllAsync(CancellationToken.None);
 
         // Assert
         Assert.NotNull(result);
