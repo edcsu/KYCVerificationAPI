@@ -11,6 +11,7 @@ public class TokenGenerationRequestValidator: AbstractValidator<TokenGenerationR
         RuleFor(request => request.UserId).NotEmpty();
         
         RuleFor(request => request.Email)
+            .Cascade(CascadeMode.Stop)
             .NotEmpty()
             .EmailAddress();
         
