@@ -36,7 +36,7 @@ public class ComplianceDocument: IDocument
 
     private void ComposeHeader(IContainer container)
     {
-        var logo = File.ReadAllBytes(@"wwwroot/images/logo.jpeg");
+        // var logo = File.ReadAllBytes(@"wwwroot/images/logo.jpeg");
         container.Row(row =>
         {
             row.RelativeItem().Column(column =>
@@ -63,8 +63,8 @@ public class ComplianceDocument: IDocument
                     text.Span($"{Model.VerificationResponses.Count()}");
                 });
             });
-
-            row.ConstantItem(100).Height(70).Image(logo);
+            
+            // row.ConstantItem(100).Height(70).Image(logo);
         });
     }
 
