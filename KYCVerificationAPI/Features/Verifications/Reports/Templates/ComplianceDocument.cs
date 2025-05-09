@@ -36,7 +36,7 @@ public class ComplianceDocument: IDocument
 
     private void ComposeHeader(IContainer container)
     {
-        var logo = File.ReadAllBytes(@"wwwroot\images\logo.jpeg");
+        var logo = File.ReadAllBytes(@"wwwroot/images/logo.jpeg");
         container.Row(row =>
         {
             row.RelativeItem().Column(column =>

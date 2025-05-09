@@ -17,7 +17,8 @@ public class TokenGenerationRequestValidator: AbstractValidator<TokenGenerationR
         
         RuleFor(request => request.CustomClaims)
             .NotEmpty()
-            .Must(claims => claims.ContainsKey(ApiConstants.ClientUserClaim))
+            .Must(claims => claims.ContainsKey(ApiConstants.ClientUserClaim) || 
+                            claims.ContainsKey(ApiConstants.AdminUserClaim))
             .WithMessage("CustomClaims must contain a 'client' key");
     }
     
