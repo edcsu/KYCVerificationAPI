@@ -256,12 +256,14 @@ The request body for client use
 | From                     | `DateOnly`   | The start date of the date range                      |
 | To                       | `DateOnly`   | The end date of the date range                        |
 
-
-
 ## ⚠️ Disclaimer
 This is a demo project.
 The mock external service does not represent a real ID verification provider.
-It shows the interaction that can be there.
+It shows the interaction that can be there. 
+A few scenarios are shown when the external API call is:
+- ✅ successful
+- ❌ fails
+- ❗️returns an error
 
 ## 📁 Project Structure
 
@@ -324,6 +326,10 @@ KYCVerificationAPI/
 
 ## ⛓️‍💥 Running Tests
 
+There are two test projects:
+1. Unit tests
+2. Integration tests
+
 - Execute the test suite using:
 ```bash 
 dotnet test
@@ -331,6 +337,9 @@ dotnet test
 
 - For specific test projects:
 ```bash 
+dotnet test ./tests/KYCVerificationAPI.IntegrationTests/KYCVerificationAPI.IntegrationTests.csproj
+```
+```bash
 dotnet test ./tests/KYCVerificationAPI.Tests/KYCVerificationAPI.Tests.csproj
 ```
  
