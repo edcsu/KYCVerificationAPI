@@ -212,7 +212,7 @@ public class VerificationsController : ControllerBase
         using (LogContext.Push(enrichers))
         {
             _logger.LogInformation("Generating compliance report");
-            var fileViewModel = await _verificationService.GetComplainceFileAsync(email, token);
+            var fileViewModel = await _verificationService.GetComplianceFileAsync(email, token);
 
             _logger.LogInformation("Finished generating compliance report");
             return File(fileViewModel.Contents, fileViewModel.ContentType, fileViewModel.Name);

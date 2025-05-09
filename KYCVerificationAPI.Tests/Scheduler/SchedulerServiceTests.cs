@@ -97,7 +97,7 @@ public class SchedulerServiceTests
     }
 
     [Fact]
-    public async Task HandleKycErrorResponse_WhenMaxRetriesReached_UpdatesStatusToFailed()
+    public Task HandleKycErrorResponse_WhenMaxRetriesReached_UpdatesStatusToFailed()
     {
         // Arrange
         var verification = TestHelpers.GetVerifications(1).First();
@@ -112,5 +112,6 @@ public class SchedulerServiceTests
         // Act & Assert
         Assert.Equal(VerificationStatus.Failed, verification.Status);
         Assert.Equal(KycStatus.Error, verification.KycStatus);
+        return Task.CompletedTask;
     }
 }
