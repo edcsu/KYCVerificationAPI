@@ -63,7 +63,9 @@ This API mimics such a scenario, integrating:
     
     dotnet run
     ```
- 
+> Ensure to check out in the `main` branch
+> `git checkout main`
+
 2. Install dependencies
     ```bash
      dotnet restore
