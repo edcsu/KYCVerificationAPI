@@ -1,9 +1,7 @@
 using KYCVerificationAPI.Core;
-using KYCVerificationAPI.Data;
 using KYCVerificationAPI.Data.Entities;
 using KYCVerificationAPI.Data.Repositories;
 using KYCVerificationAPI.Features.Verifications.Requests;
-using Microsoft.EntityFrameworkCore;
 using Moq;
 
 namespace KYCVerificationAPI.Tests.Repositories

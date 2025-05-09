@@ -49,7 +49,7 @@ public class VerificationService(IVerificationRepository verificationRepository,
         return response;
     }
 
-    public async Task<FileViewModel> GetComplainceFileAsync(string userEmail,
+    public async Task<FileViewModel> GetComplianceFileAsync(string userEmail,
         CancellationToken cancellationToken = default)
     {
         var allVerifications = await verificationRepository.GetAllAsync(cancellationToken);

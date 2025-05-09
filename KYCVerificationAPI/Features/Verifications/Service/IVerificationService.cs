@@ -18,6 +18,6 @@ public interface IVerificationService
         string userEmail,
         CancellationToken cancellationToken = default);
     
-    Task<FileViewModel> GetComplainceFileAsync(string userEmail,
+    Task<FileViewModel> GetComplianceFileAsync(string userEmail,
         CancellationToken cancellationToken = default);
 }
