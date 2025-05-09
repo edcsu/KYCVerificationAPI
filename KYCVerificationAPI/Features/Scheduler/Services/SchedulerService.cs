@@ -38,10 +38,10 @@ public class SchedulerService : ISchedulerService
         }
         
         ILogEventEnricher[] enrichers =
-        {
+        [
             new PropertyEnricher("TransactionId", request.Id),
             new PropertyEnricher("CorrelationId", request.CorrelationId)
-        };
+        ];
 
         using (LogContext.Push(enrichers))
         {
@@ -61,6 +61,7 @@ public class SchedulerService : ISchedulerService
             if (kycResponse.KycStatus == KycStatus.Error)
             {
                 await HandleKycErrorResponse(request, cancellationToken);
+                return false;
             }
 
             request.Status = VerificationStatus.Success;
@@ -98,8 +99,7 @@ public class SchedulerService : ISchedulerService
             var verificationRequest = await _verificationRepository.UpdateAsync(request, cancellationToken);
             _logger.LogError("KYC verification failed. Scheduling retry {CurrentRetry} out of {MaxRetries} for request {RequestId}", 
                 verificationRequest.Retries, ApiConstants.MaxRetryAttempts, request.Id);
+            throw new ClientFriendlyException("Failed to verify KYC data");
         }
-    
-        throw new ClientFriendlyException("Failed to verify KYC data");
     }
 }
