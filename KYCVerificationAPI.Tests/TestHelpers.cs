@@ -1,6 +1,7 @@
 using Bogus;
 using KYCVerificationAPI.Core;
 using KYCVerificationAPI.Data.Entities;
+using KYCVerificationAPI.Features.Vendors.Requests;
 using KYCVerificationAPI.Features.Vendors.Responses;
 using KYCVerificationAPI.Features.Verifications.Mappings;
 using KYCVerificationAPI.Features.Verifications.Requests;
@@ -78,5 +79,16 @@ public static class TestHelpers
             HasNextPage = filter.Page < totalPages,
             HasPreviousPage = filter.Page > 1,
         };
+    }
+    
+    public static KycRequest GetKycRequest()
+    {
+        var requestFaker = new Faker<KycRequest>()
+            .RuleFor(r => r.Nin, f => f.Random.AlphaNumeric(14))
+            .RuleFor(r => r.CardNumber, f => f.Random.AlphaNumeric(9))
+            .RuleFor(r => r.DateOfBirth, f => f.Date.PastDateOnly())
+            .RuleFor(r => r.FirstName, f => f.Name.FirstName())
+            .RuleFor(r => r.GivenName, f => f.Name.LastName());
+        return requestFaker.Generate();
     }
 }
