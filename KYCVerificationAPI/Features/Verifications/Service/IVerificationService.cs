@@ -6,7 +6,8 @@ namespace KYCVerificationAPI.Features.Verifications.Service;
 
 public interface IVerificationService
 {
-    Task<VerificationResponse> CreateAsync(CreateVerification createVerification, string correlationId,
+    Task<VerificationResponse> CreateAsync(CreateVerification createVerification, 
+        string correlationId,
         string email,
         CancellationToken cancellationToken = default);
     
@@ -15,5 +16,8 @@ public interface IVerificationService
     
     Task<PagedResult<VerificationResponse>> GetHistoryAsync(VerificationFilter verificationFilter,
         string userEmail,
+        CancellationToken cancellationToken = default);
+    
+    Task<FileViewModel> GetComplainceFileAsync(string userEmail,
         CancellationToken cancellationToken = default);
 }

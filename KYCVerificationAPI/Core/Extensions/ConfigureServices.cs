@@ -22,6 +22,7 @@ using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using QuestPDF.Infrastructure;
 using Serilog;
 
 namespace KYCVerificationAPI.Core.Extensions;
@@ -30,6 +31,8 @@ public static class ConfigureServices
 {
     public static void AddApiServices(this WebApplicationBuilder builder)
     {
+        QuestPDF.Settings.License = LicenseType.Community; 
+        
         var config = builder.Configuration;
         var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? string.Empty;
         
@@ -147,10 +150,7 @@ public static class ConfigureServices
         
         var limitOptions = new RateLimitConfig();
         builder.Configuration.GetSection(RateLimitConfig.SectionName).Bind(limitOptions);
-        foreach (var path in limitOptions.AllowedPaths)
-        {
-            Log.Information(path);
-        }
+        
         builder.Services.AddRateLimiter(options =>
         {
             options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
@@ -164,7 +164,7 @@ public static class ConfigureServices
                     Log.Information("Rate limiting applied");
                     return RateLimitPartition.GetFixedWindowLimiter(
                         ipAddress,
-                        partition => new FixedWindowRateLimiterOptions
+                        _ => new FixedWindowRateLimiterOptions
                         {
                             PermitLimit = limitOptions.PermitLimit,             
                             Window = TimeSpan.FromSeconds(limitOptions.Window), 
@@ -182,6 +182,9 @@ public static class ConfigureServices
         var jwtConfig = config.GetJwtConfig();
 
         builder.Services.AddAuthorizationBuilder()
+            .AddPolicy(ApiConstants.AdminUserPolicy, p => 
+                p.RequireAssertion( a =>
+                a.User.HasClaim(c => c is { Type: ApiConstants.AdminUserClaim, Value: "true" })))
             .AddPolicy(ApiConstants.TrustedUserPolicy, p => 
                 p.RequireAssertion( a =>
                 a.User.HasClaim(c => c is { Type: ApiConstants.AdminUserClaim, Value: "true" }) ||
@@ -200,9 +203,9 @@ public static class ConfigureServices
                 ValidateLifetime = true,
                 ValidateIssuer = true,
                 ValidateAudience = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfig.Key!)),
-                ValidIssuer = jwtConfig.Issuer!,
-                ValidAudience = jwtConfig.Audience!,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfig.Key)),
+                ValidIssuer = jwtConfig.Issuer,
+                ValidAudience = jwtConfig.Audience,
             };
         });
     }
