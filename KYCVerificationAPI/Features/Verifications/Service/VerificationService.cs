@@ -1,10 +1,13 @@
+using System.Net.Mime;
 using Hangfire;
 using KYCVerificationAPI.Core;
 using KYCVerificationAPI.Data.Repositories;
 using KYCVerificationAPI.Features.Scheduler.Services;
 using KYCVerificationAPI.Features.Verifications.Mappings;
+using KYCVerificationAPI.Features.Verifications.Reports.Templates;
 using KYCVerificationAPI.Features.Verifications.Requests;
 using KYCVerificationAPI.Features.Verifications.Responses;
+using QuestPDF.Fluent;
 
 namespace KYCVerificationAPI.Features.Verifications.Service;
 
@@ -44,5 +47,24 @@ public class VerificationService(IVerificationRepository verificationRepository,
     {
         var response = await verificationRepository.GetHistoryAsync(verificationFilter, userEmail, cancellationToken);
         return response;
+    }
+
+    public async Task<FileViewModel> GetComplainceFileAsync(string userEmail,
+        CancellationToken cancellationToken = default)
+    {
+        var allVerifications = await verificationRepository.GetAllAsync(cancellationToken);
+        var verificationResponses = allVerifications.Select(item => item.MapToVerificationResponse());
+        var complianceResponse = new ComplianceResponse()
+        {
+            MadeBy = userEmail,
+            VerificationResponses = verificationResponses
+        };
+        var complianceDocument = new ComplianceDocument(complianceResponse);
+        return new FileViewModel
+        {
+            Contents = complianceDocument.GeneratePdf(),
+            ContentType = MediaTypeNames.Application.Pdf,
+            Name = $"compliance_report{DateTime.Now:yyyyMMddHHmmss}.pdf",
+        };
     }
 }

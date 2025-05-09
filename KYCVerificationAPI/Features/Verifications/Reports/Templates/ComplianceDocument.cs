@@ -36,7 +36,7 @@ public class ComplianceDocument: IDocument
 
     private void ComposeHeader(IContainer container)
     {
-        var logo = File.ReadAllBytes("assets//logo.jpeg");
+        var logo = File.ReadAllBytes(@"wwwroot\images\logo.jpeg");
         container.Row(row =>
         {
             row.RelativeItem().Column(column =>
@@ -60,7 +60,7 @@ public class ComplianceDocument: IDocument
                 column.Item().Text(text =>
                 {
                     text.Span("Total Requests: ").SemiBold();
-                    text.Span($"{Model.VerificationResponses.Count}");
+                    text.Span($"{Model.VerificationResponses.Count()}");
                 });
             });
 
