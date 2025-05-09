@@ -22,6 +22,7 @@ using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using QuestPDF.Infrastructure;
 using Serilog;
 
 namespace KYCVerificationAPI.Core.Extensions;
@@ -30,6 +31,8 @@ public static class ConfigureServices
 {
     public static void AddApiServices(this WebApplicationBuilder builder)
     {
+        QuestPDF.Settings.License = LicenseType.Community; 
+        
         var config = builder.Configuration;
         var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? string.Empty;
         
@@ -179,6 +182,9 @@ public static class ConfigureServices
         var jwtConfig = config.GetJwtConfig();
 
         builder.Services.AddAuthorizationBuilder()
+            .AddPolicy(ApiConstants.AdminUserPolicy, p => 
+                p.RequireAssertion( a =>
+                a.User.HasClaim(c => c is { Type: ApiConstants.AdminUserClaim, Value: "true" })))
             .AddPolicy(ApiConstants.TrustedUserPolicy, p => 
                 p.RequireAssertion( a =>
                 a.User.HasClaim(c => c is { Type: ApiConstants.AdminUserClaim, Value: "true" }) ||

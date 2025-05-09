@@ -135,12 +135,13 @@ A summary of the endpoints is shown below
 
 ### 🔎 Verifications
 
-| Method | Endpoint                  | Description                                         | Auth Required  |
-|--------|---------------------------|-----------------------------------------------------|----------------|
-| POST   | `/api/verifications`      | Create new verification                             | Yes            |
-| GET    | `/api/verifications/{id}` | Get verification by ID                              | Yes            |
-| GET    | `/api/verifications`      | Returns the list of the verifications that you made | Yes            |
-| POST   | `/api/auth/token`         | Delete verification                                 | No             |
+| Method | Endpoint                    | Description                                         | Auth Required  |
+|--------|-----------------------------|-----------------------------------------------------|----------------|
+| POST   | `/api/auth/token`           | Generate an access token                            | No             |
+| POST   | `/api/verifications`        | Create new verification                             | Yes            |
+| GET    | `/api/verifications/{id}`   | Get verification by ID                              | Yes            |
+| GET    | `/api/verifications`        | Returns the list of the verifications that you made | Yes            |
+| GET    | `/api/verifications/report` | Returns a compliance report (For admins only)       | Yes            |
 
 ### 📝 Sample Requests
 
@@ -163,7 +164,7 @@ the verification endpoints. This mimics how I set up clients to use the solution
 
 `Token endpoints: https://localhost:7174/api/auth/token or https://localhost:5160/api/auth/token`
 
-The request body
+The request body for client use
 ```json lines
 {
   "userId": "2032f3c8-ecc3-4205-94d1-5b05d2ea7c65",
@@ -186,6 +187,32 @@ The request body
       }
    }'
 ```
+>💼 Admins access all endpoints, and 
+> you need an access token with admin claim to generate
+> the compliance report
+>```json5
+> // The token request body for admins
+>{
+>  "userId": "964e69e2-2a02-4ea1-934c-c75fa7c87045",
+>  "email": "admin@uverify.com",
+>  "customClaims": {
+>    "admin": true
+>  }
+>}
+>```
+>```curl
+>curl https://localhost:7174/api/auth/token \
+>--request POST \
+>--header 'Content-Type: application/json' \
+>--data '{
+>   "userId": "2032f3c8-ecc3-4205-94d1-5b05d2ea7c65",
+>   "email": "admin@uverify.com",
+>   "customClaims": {
+>       "admin": true
+>   }
+>}'
+>```
+
 #### Create Verification
 
 >http POST /api/verifications Content-Type: application/json

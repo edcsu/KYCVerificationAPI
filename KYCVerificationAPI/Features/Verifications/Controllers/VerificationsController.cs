@@ -46,8 +46,10 @@ public class VerificationsController : ControllerBase
     [Stability(Stability.Stable)]
     [ProducesResponseType(typeof(PendingResponse),StatusCodes.Status201Created, MediaTypeNames.Application.Json)]
     [ProducesResponseType( StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    [EndpointSummary("Creates a new verification.")]
+    [EndpointSummary("Creates a new verification")]
     [EndpointDescription("Creates a new verification request asynchronously.")]
     public async Task<IActionResult> CreateAsync([FromBody] CreateVerification request,
         CancellationToken token = default)
@@ -95,6 +97,8 @@ public class VerificationsController : ControllerBase
     [HttpGet("{id:Guid}", Name = "GetById")]
     [ProducesResponseType(typeof(VerificationResponse), StatusCodes.Status200OK,MediaTypeNames.Application.Json)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [EndpointSummary("Returns verification details")]
@@ -138,6 +142,8 @@ public class VerificationsController : ControllerBase
         MediaTypeNames.Application.Json)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [EndpointSummary("Returns verification history")]
     [EndpointDescription("Returns details of verifications made by the user")]
@@ -173,6 +179,43 @@ public class VerificationsController : ControllerBase
 
             _logger.LogInformation("Finished getting verifications");
             return Ok(response);
+        }
+    }
+    
+    [Authorize(ApiConstants.AdminUserPolicy)]
+    [HttpGet("report", Name = "GetComplianceReport")]
+    [ProducesResponseType(typeof(FileContentResult), 
+        StatusCodes.Status200OK,
+        MediaTypeNames.Application.Pdf)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [EndpointSummary("Compliance report")]
+    [EndpointDescription("Download a comprehensive compliance report. It is for admins only.")]
+    [Stability(Stability.Stable)]
+    public async Task<IActionResult> GetComplianceReportAsync(CancellationToken token = default)
+    {
+        var emailClaim = HttpContext.User.Claims.FirstOrDefault(it => it.Type == ClaimTypes.Email);
+        if (emailClaim is null)
+        {
+            _logger.LogError("Invalid email claim");
+            return Forbid();
+        }
+        var email = emailClaim.Value;
+        
+        var correlationId = _correlationIdGenerator.Get();
+        ILogEventEnricher[] enrichers =
+        [
+            new PropertyEnricher("CorrelationId", correlationId)
+        ];
+
+        using (LogContext.Push(enrichers))
+        {
+            _logger.LogInformation("Generating compliance report");
+            var fileViewModel = await _verificationService.GetComplainceFileAsync(email, token);
+
+            _logger.LogInformation("Finished generating compliance report");
+            return File(fileViewModel.Contents, fileViewModel.ContentType, fileViewModel.Name);
         }
     }
 }
