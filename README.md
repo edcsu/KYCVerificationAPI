@@ -39,6 +39,7 @@ This API mimics such a scenario, integrating:
 - ✅ Error handling and retry logic
 - ✅ Robust input validation
 - ✅ OpenTelemetry ready
+- ✅ Admin restricted endpoint to generate compliance reports
 - 🐳 Optional Docker setup
 
 
