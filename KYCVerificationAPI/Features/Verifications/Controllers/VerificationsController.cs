@@ -20,7 +20,6 @@ namespace KYCVerificationAPI.Features.Verifications.Controllers;
 [ApiController]
 [ApiVersion(1)]
 [Consumes(MediaTypeNames.Application.Json)]
-[Produces(MediaTypeNames.Application.Json)]
 public class VerificationsController : ControllerBase
 {
     private readonly IVerificationService _verificationService;
@@ -44,6 +43,7 @@ public class VerificationsController : ControllerBase
     [Authorize(ApiConstants.TrustedUserPolicy)]
     [HttpPost]
     [Stability(Stability.Stable)]
+    [Produces(MediaTypeNames.Application.Json)]
     [ProducesResponseType(typeof(PendingResponse),StatusCodes.Status201Created, MediaTypeNames.Application.Json)]
     [ProducesResponseType( StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -95,6 +95,7 @@ public class VerificationsController : ControllerBase
     
     [Authorize(ApiConstants.TrustedUserPolicy)]
     [HttpGet("{id:Guid}", Name = "GetById")]
+    [Produces(MediaTypeNames.Application.Json)]
     [ProducesResponseType(typeof(VerificationResponse), StatusCodes.Status200OK,MediaTypeNames.Application.Json)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -137,6 +138,7 @@ public class VerificationsController : ControllerBase
     
     [Authorize(ApiConstants.TrustedUserPolicy)]
     [HttpGet(Name = "GetHistory")]
+    [Produces(MediaTypeNames.Application.Json)]
     [ProducesResponseType(typeof(PagedResult<VerificationResponse>), 
         StatusCodes.Status200OK,
         MediaTypeNames.Application.Json)]
@@ -183,7 +185,8 @@ public class VerificationsController : ControllerBase
     }
     
     [Authorize(ApiConstants.AdminUserPolicy)]
-    [HttpGet("report", Name = "GetComplianceReport")]
+    [HttpGet("report", Name = "GetComplianceReport")] 
+    [Produces(MediaTypeNames.Application.Pdf)]
     [ProducesResponseType(typeof(FileContentResult), 
         StatusCodes.Status200OK,
         MediaTypeNames.Application.Pdf)]
