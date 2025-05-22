@@ -79,6 +79,9 @@ public class VerificationRepository : IVerificationRepository
         if (!string.IsNullOrWhiteSpace(verificationFilter.GivenName))
             query = query.Where(v => v.GivenName.Contains(verificationFilter.GivenName));
         
+        if (!string.IsNullOrWhiteSpace(verificationFilter.Nin))
+            query = query.Where(v => v.Nin.Contains(verificationFilter.Nin));
+        
         if (verificationFilter.NameAsPerIdMatches.HasValue)
             query = query.Where(v => v.NameAsPerIdMatches == verificationFilter.NameAsPerIdMatches);
         
