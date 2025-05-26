@@ -1,6 +1,5 @@
 using KYCVerificationAPI.Data.Repositories;
 using KYCVerificationAPI.Features.Verifications.Requests;
-using Moq;
 
 namespace KYCVerificationAPI.IntegrationTests;
 

@@ -12,7 +12,7 @@ public record TokenGenerationRequest
     [EmailAddress]
     public required string Email { get; set; }
 
-    [Description("A collection of calims for the user")]
+    [Description("A collection of claims for the user")]
     [MinLength(1)]
-    public required Dictionary<string, object> CustomClaims { get; set; } = new();
+    public required Dictionary<string, object> CustomClaims { get; init; } = new();
 }
