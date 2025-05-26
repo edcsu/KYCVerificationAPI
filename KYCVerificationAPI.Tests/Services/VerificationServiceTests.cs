@@ -6,7 +6,6 @@ using KYCVerificationAPI.Core;
 using KYCVerificationAPI.Data.Entities;
 using KYCVerificationAPI.Data.Repositories;
 using KYCVerificationAPI.Features.Scheduler.Services;
-using KYCVerificationAPI.Features.Verifications.Mappings;
 using KYCVerificationAPI.Features.Verifications.Requests;
 using KYCVerificationAPI.Features.Verifications.Responses;
 using KYCVerificationAPI.Features.Verifications.Service;

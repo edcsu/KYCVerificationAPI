@@ -5,8 +5,8 @@ namespace KYCVerificationAPI.Features.Auth.Responses;
 public record TokenResponse
 {
     [Description("The access token")]
-    public string AccessToken { get; set; } = null!;
+    public string AccessToken { get; init; } = null!;
     
-    [Description("The time in minutes when the token expires")]
-    public double ExpiresIn { get; set; }
+    [Description("The expiration time in minutes")]
+    public double ExpiresIn { get; init; }
 }
