@@ -8,8 +8,8 @@ using KYCVerificationAPI.Features.Verifications.Responses;
 
 namespace KYCVerificationAPI.IntegrationTests;
 
-[Collection("VerificationTests")]
-public class VerificationIntegrationTests : IAsyncLifetime
+[Collection(nameof(VerificationTestCollection))]
+public class VerificationIntegrationTests : IClassFixture<KycWebApplicationFactory>
 {
     private readonly KycWebApplicationFactory _factory;
     private readonly HttpClient _client;
@@ -21,9 +21,6 @@ public class VerificationIntegrationTests : IAsyncLifetime
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer",
             IntegrationHelpers.GetToken());
     }
-
-    public Task InitializeAsync() => Task.CompletedTask;
-    public Task DisposeAsync() => Task.CompletedTask;
 
     [Fact]
     public async Task CreateVerification_ShouldReturnCreated_WhenValidRequest()
@@ -42,7 +39,7 @@ public class VerificationIntegrationTests : IAsyncLifetime
         result.TransactionId.ShouldNotBe(Guid.Empty);
         
         // Verify database state
-        var verification = await _factory.DbContext.Verifications
+        var verification = await _factory.SharedFixture.DbContext.Verifications
             .FirstOrDefaultAsync(v => v.Id == result.TransactionId);
         verification.ShouldNotBeNull();
     }
@@ -124,7 +121,7 @@ public class VerificationIntegrationTests : IAsyncLifetime
         result.ShouldNotBeNull();
 
         // Assert - Check Database State
-        var dbVerification = await _factory.DbContext.Verifications
+        var dbVerification = await _factory.SharedFixture.DbContext.Verifications
             .AsNoTracking()
             .FirstOrDefaultAsync(v => v.Id == result.TransactionId);
 
@@ -134,11 +131,4 @@ public class VerificationIntegrationTests : IAsyncLifetime
             DateTime.UtcNow.AddMinutes(-1), 
             DateTime.UtcNow);
     }
-}
-
-// Ensure you have this collection definition
-[CollectionDefinition("VerificationTests")]
-public class VerificationTestCollection : ICollectionFixture<KycWebApplicationFactory>
-{
-    // This class is empty but required for the CollectionDefinition attribute
 }

@@ -4,11 +4,11 @@ using Shouldly;
 
 namespace KYCVerificationAPI.IntegrationTests;
 
-public class VerificationRepositoryTests : IClassFixture<DatabaseFixture>
+public class VerificationRepositoryTests : IClassFixture<SharedFixture>
 {
     private readonly VerificationRepository _verificationRepository;
     
-    public VerificationRepositoryTests(DatabaseFixture fixture)
+    public VerificationRepositoryTests(SharedFixture fixture)
     {
         _verificationRepository = new VerificationRepository(fixture.DbContext);
     }
