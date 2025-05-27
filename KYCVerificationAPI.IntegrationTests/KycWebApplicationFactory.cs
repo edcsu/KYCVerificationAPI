@@ -1,10 +1,8 @@
-using System.Data.Common;
 using KYCVerificationAPI.Data;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Testcontainers.PostgreSql;
 
 namespace KYCVerificationAPI.IntegrationTests;
