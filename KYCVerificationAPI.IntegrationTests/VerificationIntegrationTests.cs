@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Shouldly;
 using KYCVerificationAPI.Core;
 using KYCVerificationAPI.Features.Verifications.Responses;
+using Microsoft.AspNetCore.Mvc;
 
 namespace KYCVerificationAPI.IntegrationTests;
 
@@ -88,9 +89,16 @@ public class VerificationIntegrationTests : IClassFixture<KycWebApplicationFacto
 
         // Act
         var response = await _client.PostAsJsonAsync("/api/verifications", invalidRequest);
+        var validationResult = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+        validationResult?.Errors.Count.ShouldBe(2);
+        validationResult?.Title.ShouldBe("One or more validation errors occurred.");
+        
+        var error = validationResult?.Errors.FirstOrDefault();
+        error?.Key.ShouldBe("$");
+        error?.Value.First().ShouldBe("JSON deserialization for type 'KYCVerificationAPI.Features.Verifications.Requests.CreateVerification' was missing required properties including: 'firstName', 'givenName', 'dateOfBirth', 'nin', 'cardNumber'.");
     }
 
     [Fact]
