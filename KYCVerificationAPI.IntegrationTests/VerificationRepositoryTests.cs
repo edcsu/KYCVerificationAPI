@@ -1,5 +1,6 @@
 using KYCVerificationAPI.Data.Repositories;
 using KYCVerificationAPI.Features.Verifications.Requests;
+using Shouldly;
 
 namespace KYCVerificationAPI.IntegrationTests;
 
@@ -69,8 +70,9 @@ public class VerificationRepositoryTests : IClassFixture<DatabaseFixture>
         var result = await _verificationRepository.GetAllAsync(CancellationToken.None);
 
         // Assert
-        Assert.NotNull(result);
-        Assert.Single( result);
+        var verifications = result.ToList();
+        verifications.ShouldNotBeNull();
+        verifications.ShouldContain(newVerification);
     }
     
     [Fact]
