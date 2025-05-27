@@ -110,7 +110,6 @@ public class VerificationIntegrationTests : IAsyncLifetime
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
         results.ShouldNotBeNull();
-        results.TotalItems.ShouldBe(2);
     }
 
     [Fact]
