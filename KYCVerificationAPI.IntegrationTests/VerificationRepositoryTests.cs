@@ -4,14 +4,20 @@ using Shouldly;
 
 namespace KYCVerificationAPI.IntegrationTests;
 
-public class VerificationRepositoryTests : IClassFixture<SharedFixture>
+public class VerificationRepositoryTests : IClassFixture<SharedFixture>, IAsyncLifetime
 {
     private readonly VerificationRepository _verificationRepository;
+    private readonly SharedFixture _sharedFixture;
     
     public VerificationRepositoryTests(SharedFixture fixture)
     {
         _verificationRepository = new VerificationRepository(fixture.DbContext);
+        _sharedFixture = fixture;
     }
+    
+    public Task InitializeAsync() => Task.CompletedTask;
+
+    public async Task DisposeAsync() => await _sharedFixture.ResetDatabaseAsync();
     
     [Fact]
     public async Task Add_ShouldAddNewVerification()

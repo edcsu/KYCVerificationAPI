@@ -9,7 +9,7 @@ using KYCVerificationAPI.Features.Verifications.Responses;
 namespace KYCVerificationAPI.IntegrationTests;
 
 [Collection(nameof(VerificationTestCollection))]
-public class VerificationIntegrationTests : IClassFixture<KycWebApplicationFactory>
+public class VerificationIntegrationTests : IClassFixture<KycWebApplicationFactory>, IAsyncLifetime
 {
     private readonly KycWebApplicationFactory _factory;
     private readonly HttpClient _client;
@@ -21,6 +21,10 @@ public class VerificationIntegrationTests : IClassFixture<KycWebApplicationFacto
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer",
             IntegrationHelpers.GetToken());
     }
+    
+    public Task InitializeAsync() => Task.CompletedTask;
+
+    public async Task DisposeAsync() => await _factory.SharedFixture.ResetDatabaseAsync();
 
     [Fact]
     public async Task CreateVerification_ShouldReturnCreated_WhenValidRequest()
@@ -107,6 +111,7 @@ public class VerificationIntegrationTests : IClassFixture<KycWebApplicationFacto
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
         results.ShouldNotBeNull();
+        results.TotalItems.ShouldBe(2);
     }
 
     [Fact]

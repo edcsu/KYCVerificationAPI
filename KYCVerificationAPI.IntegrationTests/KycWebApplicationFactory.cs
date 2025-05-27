@@ -14,7 +14,7 @@ public class KycWebApplicationFactory(SharedFixture sharedFixture) : WebApplicat
     
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        builder.UseSetting("ConnectionStrings:DefaultConnection", sharedFixture.DatabaseConnectionString);
+        Environment.SetEnvironmentVariable("ConnectionStrings:DefaultConnection", sharedFixture.DatabaseConnectionString);
 
         builder.ConfigureServices(services =>
         {
