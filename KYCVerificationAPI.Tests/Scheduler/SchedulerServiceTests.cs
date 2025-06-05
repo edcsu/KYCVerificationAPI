@@ -8,6 +8,7 @@ using KYCVerificationAPI.Features.Vendors.Responses;
 using KYCVerificationAPI.Features.Vendors.Services;
 using Microsoft.Extensions.Logging;
 using Moq;
+using Xunit.Abstractions;
 
 namespace KYCVerificationAPI.Tests.Scheduler;
 
@@ -18,15 +19,15 @@ public class SchedulerServiceTests
     private readonly Mock<IExternalIdService> _externalIdServiceMock;
     private readonly SchedulerService _schedulerService;
 
-    public SchedulerServiceTests()
+    public SchedulerServiceTests(ITestOutputHelper testOutputHelper)
     {
         _verificationRepositoryMock = new Mock<IVerificationRepository>();
         _externalIdServiceMock = new Mock<IExternalIdService>();
-        var loggerMock = new Mock<ILogger<SchedulerService>>();
+        var logger = testOutputHelper.BuildLoggerFor<SchedulerService>();
         _schedulerService = new SchedulerService(
             _verificationRepositoryMock.Object,
             _externalIdServiceMock.Object,
-            loggerMock.Object);
+            logger);
     }
 
     [Fact]

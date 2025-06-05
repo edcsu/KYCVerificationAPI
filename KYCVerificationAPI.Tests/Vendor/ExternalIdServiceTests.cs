@@ -3,6 +3,7 @@ using KYCVerificationAPI.Features.Vendors.Responses;
 using KYCVerificationAPI.Features.Vendors.Services;
 using Microsoft.Extensions.Logging;
 using Moq;
+using Xunit.Abstractions;
 
 namespace KYCVerificationAPI.Tests.Vendor;
 
@@ -10,10 +11,10 @@ public class ExternalIdServiceTests
 {
     private readonly ExternalIdService _externalIdService;
 
-    public ExternalIdServiceTests()
+    public ExternalIdServiceTests(ITestOutputHelper testOutputHelper)
     {
-        var loggerMock = new Mock<ILogger<ExternalIdService>>();
-        _externalIdService = new ExternalIdService(loggerMock.Object);
+        var logger = testOutputHelper.BuildLoggerFor<ExternalIdService>();
+        _externalIdService = new ExternalIdService(logger);
     }
 
     [Fact]
