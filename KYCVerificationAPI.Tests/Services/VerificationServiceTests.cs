@@ -12,30 +12,30 @@ using KYCVerificationAPI.Features.Verifications.Service;
 using Microsoft.Extensions.Logging;
 using Moq;
 using QuestPDF.Infrastructure;
+using Xunit.Abstractions;
 
 namespace KYCVerificationAPI.Tests.Services;
 
 public class VerificationServiceTests
 {
     private readonly Mock<IVerificationRepository> _mockRepository;
-    private readonly Mock<ISchedulerService> _mockSchedulerService;
     private readonly Mock<IBackgroundJobClient> _mockBackgroundJob;
-    private readonly Mock<ILogger<VerificationService>> _mockLogger;
     private readonly VerificationService _service;
     private const string CorrelationId = "test-correlation-id";
     private const string Email = "test@example.com";
-    public VerificationServiceTests()
+    
+    public VerificationServiceTests(ITestOutputHelper testOutputHelper)
     {
         _mockRepository = new Mock<IVerificationRepository>();
-        _mockSchedulerService = new Mock<ISchedulerService>();
+        var mockSchedulerService = new Mock<ISchedulerService>();
         _mockBackgroundJob = new Mock<IBackgroundJobClient>();
-        _mockLogger = new Mock<ILogger<VerificationService>>();
+        ILogger<VerificationService> logger = testOutputHelper.BuildLoggerFor<VerificationService>();
         
         _service = new VerificationService(
             _mockRepository.Object,
-            _mockSchedulerService.Object,
+            mockSchedulerService.Object,
             _mockBackgroundJob.Object,
-            _mockLogger.Object
+            logger
         );
         
         _mockBackgroundJob.Setup(x => x.Create(It.Is<Job>(
